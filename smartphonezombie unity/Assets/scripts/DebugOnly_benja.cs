@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class DebugOnly_benja : MonoBehaviour {
 
-	public ParagliderMainScript mainScript;
+	public DebugInfo_benja debugManager;
 	public bool isDebug = true;
     private bool isConnected = false;
+    public bool disableRendererOnly = true;
+    public bool includeThisObjetc = false;
 	// Use this for initialization
 	void Awake () {
-		mainScript = FindObjectOfType<ParagliderMainScript>();
+        debugManager = FindObjectOfType<DebugInfo_benja>();
 		//Debug.Log("main script " + mainScript.name);
 		onDebugChange(false);
         connect(true);
@@ -18,8 +20,8 @@ public class DebugOnly_benja : MonoBehaviour {
     public void connect(bool shouldBeConnected)
     {
 		if(isConnected == shouldBeConnected) return;
-		if(shouldBeConnected) mainScript.onDebugChange += this.onDebugChange;
-		else mainScript.onDebugChange -= this.onDebugChange;
+		if(shouldBeConnected) debugManager.onDebugChange += this.onDebugChange;
+		else debugManager.onDebugChange -= this.onDebugChange;
 		isConnected = shouldBeConnected;
     }
 
@@ -35,19 +37,32 @@ public class DebugOnly_benja : MonoBehaviour {
 
 
     void onDebugChange(bool debug)
-    {/*
+    {
         isDebug = debug;
-		for (int ID = 0; ID < this.transform.childCount; ID++)
-	     {
-        	this.transform.GetChild(ID).gameObject.SetActive(debug);
-    	 }
-    	 this.gameObject.SetActive(debug);
-     */
-     Renderer[] renderers = GetComponentsInChildren<Renderer>();
-		foreach(Renderer rendi in renderers)
-		{
-			rendi.enabled=debug;
-		}
+        if (disableRendererOnly)
+        {
+            Renderer[] renderers = GetComponentsInChildren<Renderer>();
+            foreach (Renderer rendi in renderers)
+            {
+                rendi.enabled = debug;
+            }
+            if (includeThisObjetc)
+            {
+                GetComponent<Renderer>().enabled = debug;
+            }
+        }
+        else
+        {
+            for (int ID = 0; ID < this.transform.childCount; ID++)
+            {
+                this.transform.GetChild(ID).gameObject.SetActive(debug);
+            }
+            if (includeThisObjetc)
+            {
+                this.gameObject.SetActive(debug);
+            }
+        }
+
     }
 
 }

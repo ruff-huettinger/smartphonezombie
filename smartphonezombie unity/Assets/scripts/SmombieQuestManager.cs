@@ -1,8 +1,13 @@
-﻿using System.Collections;
+﻿using UnityEngine;
+using UnityEditor;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
-public class smombieObstackleManager : MonoBehaviour {
+
+public class SmombieQuestManager : MonoBehaviour {
+
+
+ 
 
 	// Use this for initialization
 	void Start () {
@@ -15,14 +20,20 @@ public class smombieObstackleManager : MonoBehaviour {
 	}
 
     /*
+
      
-	//public List<Obstacle> obstacles = new List<Obstacle>();
-	[Header("Obstacles")]
-	public ParagliderFlyingObjSpawnPoint monileObjectsSpawnPoints;
-	public mobileObstacle[] flyingObstacles = new mobileObstacle[12] ;
-	public staticObstacle[] staticObstacles = new staticObstacle[12] ;
-	public List<ParagliderFlyingObstacle> availableMobilObstacles;
-	public RenderTexture previewTexture;
+	//public List<questacle> questacles = new List<questacle>();
+	[Header("questacles")]
+
+
+	public staticquestacle[] streetQuestLib = new staticquestacle[12] ; // all available questacles in the street
+    public staticquestacle[] cornerquestacleLib = new staticquestacle[12];   // all available Quests on corners
+    public staticquestacle[] fotoQuestLib = new staticquestacle[3]; // all available foto Quests
+    public Transform[] cornerSpawnPointLib;
+    public Transform[] streetSpawnPointLib;
+    public Transform[] fotoSpawnpointLib;
+    public staticquestacle fotoQuestInGame;
+    public List<staticquestacle> QuestsInGame;
 
 	public delegate void Delegate();
     public Delegate onSetupFinished;
@@ -30,58 +41,11 @@ public class smombieObstackleManager : MonoBehaviour {
 
 
 
-	[System.Serializable]
-	public class mobileObstacle
-	{
-		public GameObject Object;
-		 
-		public int maxAppearances=0;
-		public float maxSpeed=0;
-		public bool canAppear=false;
-
-		public mobileObstacle ()
-		{
-			maxAppearances=0;
-			maxSpeed=0;
-			canAppear=false;
-//			GameObject = null;a
-		}
-
-	}
-
-	[CustomPropertyDrawer(typeof(mobileObstacle))]
-	public class ObstacleDrawer : PropertyDrawer 
-	{
-	    // Draw the property inside the given rect
-	    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) 
-	    {
-	        // Using BeginProperty / EndProperty on the parent property means that
-	        // prefab override logic works on the entire property.
-	        EditorGUI.BeginProperty(position, label, property);
-	        // Draw label
-	        position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
-	        // Don't make child fields be indented
-	        int indent = EditorGUI.indentLevel;
-	        EditorGUI.indentLevel = 0;
-	        // draw
-			position.x = 100;
-			position.x += labeledField(position.x , position.y,0,Mathf.Max(50,200),position.height,"",property.FindPropertyRelative ("Object"));
-			position.x += labeledField(position.x, position.y,40,25,position.height,"count",property.FindPropertyRelative ("maxAppearances"));
-			if (property.FindPropertyRelative("maxAppearances").intValue>0)
-			{
-				position.x += labeledField(position.x, position.y,40,35,position.height,"v max",property.FindPropertyRelative ("maxSpeed"));
-				position.x += labeledField(position.x, position.y,30,5,position.height,"fade",property.FindPropertyRelative ("canAppear"));
-			}
-	        // Set indent back to what it was
-	        EditorGUI.indentLevel = indent;
-	        EditorGUI.EndProperty();
-	    }
-	}
 
 	[System.Serializable]
-	public class staticObstacle
+	public class staticquestacle
 	{
-		public ParagliderStaticObstackles Object;
+		public SmombieStaticQuests Object;
 		public int maxAppearances=0;
 
 		public void distribute()
@@ -93,8 +57,8 @@ public class smombieObstackleManager : MonoBehaviour {
 	}
 
 
-	[CustomPropertyDrawer(typeof(staticObstacle))]
-	public class staticObstacleDrawer : PropertyDrawer 
+	[CustomPropertyDrawer(typeof(staticquestacle))]
+	public class staticquestacleDrawer : PropertyDrawer 
 	{
 	    // Draw the property inside the given rect
 	    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) 
@@ -127,34 +91,34 @@ public class smombieObstackleManager : MonoBehaviour {
 	    }
 
 
-	public void orderMobileObstacles(mobileObstacle[] Array)
+	public void orderquestacles(staticquestacle[] Array)
 	{
-		availableMobilObstacles.Clear();
+		availableMobilquestacles.Clear();
 		for(int i = 0;i<Array.Length;i++)
 		{
 			if (Array[i].Object!=null && Array[i].maxAppearances>0)
 			{
 				for (int j=0;j<Array[i].maxAppearances;j++)
 				{
-					availableMobilObstacles.Add(Array[i].Object.GetComponent<ParagliderFlyingObstacle>());
-                    //Debug.Log("█ available onject added:" + availableMobilObstacles[availableMobilObstacles.Count-1]);
+					availableMobilquestacles.Add(Array[i].Object.GetComponent<ParagliderFlyingquestacle>());
+                    //Debug.Log("█ available onject added:" + availableMobilquestacles[availableMobilquestacles.Count-1]);
                 }
 			}
 		}
 	}
 
-	public ParagliderFlyingObstacle spawnFlyingObject()
+	public ParagliderFlyingquestacle spawnFlyingObject()
 	{
-        if (availableMobilObstacles.Count > 0)
+        if (availableMobilquestacles.Count > 0)
         {
-            int i = UnityEngine.Random.Range(0, availableMobilObstacles.Count);
-            Debug.Log("level "+SceneManager.GetActiveScene().name+" - fetching index " + i + " out of " + availableMobilObstacles.Count + "available objetcs");
-            GameObject copy = Instantiate(availableMobilObstacles[i].gameObject);
+            int i = UnityEngine.Random.Range(0, availableMobilquestacles.Count);
+            Debug.Log("level "+SceneManager.GetActiveScene().name+" - fetching index " + i + " out of " + availableMobilquestacles.Count + "available objetcs");
+            GameObject copy = Instantiate(availableMobilquestacles[i].gameObject);
             copy.transform.parent = terrain.transform;
             copy.SetActive(true);
-            ParagliderFlyingObstacle output = copy.GetComponent<ParagliderFlyingObstacle>();
-            availableMobilObstacles.RemoveAt(i);
-            Debug.Log(i + "of" + availableMobilObstacles.Count + " available objects is a " + copy.name + " with script " + output + "is ready to be spawned");
+            ParagliderFlyingquestacle output = copy.GetComponent<ParagliderFlyingquestacle>();
+            availableMobilquestacles.RemoveAt(i);
+            Debug.Log(i + "of" + availableMobilquestacles.Count + " available objects is a " + copy.name + " with script " + output + "is ready to be spawned");
             output.spawn();
             return output;
         }
@@ -165,11 +129,11 @@ public class smombieObstackleManager : MonoBehaviour {
 
 
 
-	public void distributeStatObst()
+	public void distributeStatquest()
 	{
-		foreach( staticObstacle obst in staticObstacles)
+		foreach( staticquestacle quest in streetQuests)
 		{
-			obst.distribute();
+			quest.distribute();
 		}
 	}
 
@@ -206,8 +170,8 @@ public class smombieObstackleManager : MonoBehaviour {
 	public void delayedSetup()
 	{
 		waitForDelayedSetup=false;
-		distributeStatObst();
-		orderMobileObstacles(flyingObstacles);
+		distributeStatquest();
+		orderMobilequestacles(flyingquestacles);
 		if (terrain != null)
         {
 			makeLevelPreview();
@@ -249,6 +213,5 @@ public class smombieObstackleManager : MonoBehaviour {
 			delayedAwake();
 		}
 	}
-
-     */
+    /**/
 }

@@ -57,7 +57,7 @@ public class ParagliderMainScript : MonoBehaviour {
 	void onLevelsLoaded()	//wird ausgelöst wenn alle levels geladen sind
 	public void NextLevel()	//startet das nächste Level
 
-	OBSTACKLES
+	QuestS
 
 	public void onCrash()	//wird ausgelöst bei crash mit hindernis oder Umgebung
 	public void onFinish()	//wird ausgelöst bei Treffen auf Ziel
@@ -322,7 +322,7 @@ public class ParagliderMainScript : MonoBehaviour {
             debugInfo.log(": CHEATKEYS","");
             debugInfo.log("key D", "toggle Debug");
             debugInfo.log("key R", "respawn glider");
-            debugInfo.log("key S", "spawn obstacle");
+            debugInfo.log("key S", "spawn questacle");
             debugInfo.log("key L", "next level");
             debugInfo.log("key X", "reset game");
             debugInfo.log("key g", "toggle godmode");

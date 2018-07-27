@@ -20,12 +20,12 @@ public class ParagliderLevel : MonoBehaviour {
 
 	public Texture2D map;
 	public Vector2 scale;
-	//public List<Obstacle> obstacles = new List<Obstacle>();
-	[Header("Obstacles")]
+	//public List<questacle> questacles = new List<questacle>();
+	[Header("questacles")]
 	public ParagliderFlyingObjSpawnPoint monileObjectsSpawnPoints;
-	public mobileObstacle[] flyingObstacles = new mobileObstacle[12] ;
-	public staticObstacle[] staticObstacles = new staticObstacle[12] ;
-	public List<ParagliderFlyingObstacle> availableMobilObstacles;
+	public mobilequestacle[] flyingquestacles = new mobilequestacle[12] ;
+	public staticquestacle[] staticquestacles = new staticquestacle[12] ;
+	public List<ParagliderFlyingquestacle> availableMobilquestacles;
 	public RenderTexture previewTexture;
 
 	public delegate void Delegate();
@@ -35,7 +35,7 @@ public class ParagliderLevel : MonoBehaviour {
 
 
 	[System.Serializable]
-	public class mobileObstacle
+	public class mobilequestacle
 	{
 		public GameObject Object;
 		 
@@ -43,7 +43,7 @@ public class ParagliderLevel : MonoBehaviour {
 		public float maxSpeed=0;
 		public bool canAppear=false;
 
-		public mobileObstacle ()
+		public mobilequestacle ()
 		{
 			maxAppearances=0;
 			maxSpeed=0;
@@ -53,8 +53,8 @@ public class ParagliderLevel : MonoBehaviour {
 
 	}
 
-	[CustomPropertyDrawer(typeof(mobileObstacle))]
-	public class ObstacleDrawer : PropertyDrawer 
+	[CustomPropertyDrawer(typeof(mobilequestacle))]
+	public class questacleDrawer : PropertyDrawer 
 	{
 	    // Draw the property inside the given rect
 	    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) 
@@ -83,9 +83,9 @@ public class ParagliderLevel : MonoBehaviour {
 	}
 
 	[System.Serializable]
-	public class staticObstacle
+	public class staticquestacle
 	{
-		public ParagliderStaticObstackles Object;
+		public ParagliderStaticQuests Object;
 		public int maxAppearances=0;
 
 		public void distribute()
@@ -97,8 +97,8 @@ public class ParagliderLevel : MonoBehaviour {
 	}
 
 
-	[CustomPropertyDrawer(typeof(staticObstacle))]
-	public class staticObstacleDrawer : PropertyDrawer 
+	[CustomPropertyDrawer(typeof(staticquestacle))]
+	public class staticquestacleDrawer : PropertyDrawer 
 	{
 	    // Draw the property inside the given rect
 	    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) 
@@ -131,34 +131,34 @@ public class ParagliderLevel : MonoBehaviour {
 	    }
 
 
-	public void orderMobileObstacles(mobileObstacle[] Array)
+	public void orderMobilequestacles(mobilequestacle[] Array)
 	{
-		availableMobilObstacles.Clear();
+		availableMobilquestacles.Clear();
 		for(int i = 0;i<Array.Length;i++)
 		{
 			if (Array[i].Object!=null && Array[i].maxAppearances>0)
 			{
 				for (int j=0;j<Array[i].maxAppearances;j++)
 				{
-					availableMobilObstacles.Add(Array[i].Object.GetComponent<ParagliderFlyingObstacle>());
-                    //Debug.Log("█ available onject added:" + availableMobilObstacles[availableMobilObstacles.Count-1]);
+					availableMobilquestacles.Add(Array[i].Object.GetComponent<ParagliderFlyingquestacle>());
+                    //Debug.Log("█ available onject added:" + availableMobilquestacles[availableMobilquestacles.Count-1]);
                 }
 			}
 		}
 	}
 
-	public ParagliderFlyingObstacle spawnFlyingObject()
+	public ParagliderFlyingquestacle spawnFlyingObject()
 	{
-        if (availableMobilObstacles.Count > 0)
+        if (availableMobilquestacles.Count > 0)
         {
-            int i = UnityEngine.Random.Range(0, availableMobilObstacles.Count);
-            Debug.Log("level "+SceneManager.GetActiveScene().name+" - fetching index " + i + " out of " + availableMobilObstacles.Count + "available objetcs");
-            GameObject copy = Instantiate(availableMobilObstacles[i].gameObject);
+            int i = UnityEngine.Random.Range(0, availableMobilquestacles.Count);
+            Debug.Log("level "+SceneManager.GetActiveScene().name+" - fetching index " + i + " out of " + availableMobilquestacles.Count + "available objetcs");
+            GameObject copy = Instantiate(availableMobilquestacles[i].gameObject);
             copy.transform.parent = terrain.transform;
             copy.SetActive(true);
-            ParagliderFlyingObstacle output = copy.GetComponent<ParagliderFlyingObstacle>();
-            availableMobilObstacles.RemoveAt(i);
-            Debug.Log(i + "of" + availableMobilObstacles.Count + " available objects is a " + copy.name + " with script " + output + "is ready to be spawned");
+            ParagliderFlyingquestacle output = copy.GetComponent<ParagliderFlyingquestacle>();
+            availableMobilquestacles.RemoveAt(i);
+            Debug.Log(i + "of" + availableMobilquestacles.Count + " available objects is a " + copy.name + " with script " + output + "is ready to be spawned");
             output.spawn();
             return output;
         }
@@ -169,11 +169,11 @@ public class ParagliderLevel : MonoBehaviour {
 
 
 
-	public void distributeStatObst()
+	public void distributeStatquest()
 	{
-		foreach( staticObstacle obst in staticObstacles)
+		foreach( staticquestacle quest in staticquestacles)
 		{
-			obst.distribute();
+			quest.distribute();
 		}
 	}
 
@@ -210,8 +210,8 @@ public class ParagliderLevel : MonoBehaviour {
 	public void delayedSetup()
 	{
 		waitForDelayedSetup=false;
-		distributeStatObst();
-		orderMobileObstacles(flyingObstacles);
+		distributeStatquest();
+		orderMobilequestacles(flyingquestacles);
 		if (terrain != null)
         {
 			makeLevelPreview();

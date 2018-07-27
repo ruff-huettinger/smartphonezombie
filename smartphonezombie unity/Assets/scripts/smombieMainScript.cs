@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class smombieMainScript : MonoBehaviour {
+public class SmombieMainScript : MonoBehaviour {
 
-    smombieObstackleManager obstControl;
+    SmombieQuestManager questControl;
     recordAndPlayPath_Benja pathControl;
     public float speed;
     public float pathProgress;

@@ -5,6 +5,9 @@ using UnityEngine;
 public class DebugInfo_benja : MonoBehaviour {
 
     public UnityEngine.UI.Text textField;
+    public delegate void boolDelegate(bool theBool);
+    public boolDelegate onDebugChange;
+
 	// Use this for initialization
 	void Start () {
 	    	
@@ -52,7 +55,7 @@ public class DebugInfo_benja : MonoBehaviour {
     // Update is called once per frame
     void Update () {
         
-        if(doUpdate)
+        if(doUpdate && debugging)
         {
             doUpdate = false;
             updateText();
@@ -60,55 +63,12 @@ public class DebugInfo_benja : MonoBehaviour {
         textField.enabled = debugging;
     }
 
-    public ParagliderMainScript mainScript;
-    private bool isConnected = false;
-    // Use this for initialization
-    void Awake()
-    {
-        mainScript = FindObjectOfType<ParagliderMainScript>();
-        onDebugChange(mainScript.debug);
-        connect(true);
-    }
-
-    public void connect(bool shouldBeConnected)
-    {
-        if (isConnected)
-        {
-            if (!shouldBeConnected)
-            {
-                mainScript.onDebugChange -= this.onDebugChange;
-            }
-        }
-        else
-        {
-            if (shouldBeConnected)
-            {
-                mainScript.onDebugChange += this.onDebugChange;
-            }
-        }
-    }
-
-    private void OnEnable()
-    {
-        connect(true);
-    }
-
-    private void OnDisable()
-    {
-        connect(false);
-    }
-
-    private void OnDestroy()
-    {
-        connect(false);
-    }
 
 
-    void onDebugChange(bool debug)
+    void setDebugState(bool debug)
     {
         debugging = debug;
-        gameObject.SetActive(debugging);
-
+        onDebugChange(debug);
     }
 
 }
