@@ -17,7 +17,7 @@ public class SmombieMainScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        pathProgress = pathControl.playheadPosition01();
+        //pathProgress = pathControl.playheadPosition01();
 
 	}
 }

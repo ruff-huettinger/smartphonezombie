@@ -10,7 +10,7 @@ public class DebugOnly_benja : MonoBehaviour {
     public bool disableRendererOnly = true;
     public bool includeThisObjetc = false;
 	// Use this for initialization
-	void Awake () {
+	void Start () {
         debugManager = FindObjectOfType<DebugInfo_benja>();
 		//Debug.Log("main script " + mainScript.name);
 		onDebugChange(false);

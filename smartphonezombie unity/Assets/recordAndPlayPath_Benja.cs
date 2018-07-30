@@ -142,6 +142,7 @@ public class recordAndPlayPath_Benja : MonoBehaviour {
     {
         bool returnValue = true;
         playheadPositionInM += Time.deltaTime * speedInMPerS;
+        playheadPositionInM = Mathf.Clamp(playheadPositionInM, 0, pathDistance);
         if (playheadPositionInM >= pathDistance)
         {
             playheadPositionInM = pathDistance;
@@ -152,10 +153,9 @@ public class recordAndPlayPath_Benja : MonoBehaviour {
         float a =(float) i * keyframeDistance;
         //makes sure last frame (which is most likely closer than keyframe distance) wont overshoot
         float b = Mathf.Min(a + keyframeDistance, pathDistance); 
-        float t = Mathf.InverseLerp(a, b, pathDistance);
+        float t = Mathf.InverseLerp(a, b, playheadPositionInM   );
         followingObject.transform.position = Vector3.Lerp(keyframes[i].transform.position, keyframes[i + 1].transform.position, t);
         followingObject.transform.rotation = Quaternion.Lerp(keyframes[i].transform.rotation, keyframes[i + 1].transform.rotation, t);
-
         return returnValue;
     }
 
