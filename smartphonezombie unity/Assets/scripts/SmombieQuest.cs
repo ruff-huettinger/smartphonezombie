@@ -5,12 +5,13 @@ using UnityEngine;
 public class SmombieQuest : MonoBehaviour {
 
     public bool isStreetQuest = false;
-    public bool isCornerQuest = false;
+    public bool isCrossingQuest = false;
+    public bool isCarrierQuest = false;
     public bool isHouseQuest = false;
     public bool isFotoQuest = false;
     public bool isMirrored = false;
     public bool isAnimated = false;
-    public int state = 0; //0 = ready, 1= intro (animation), 2= fail, 3= pass;
+    public int state = -1; //0 = ready, 1= intro (animation), 2= fail, 3= pass;
     public GameObject[] standbyQuad = new GameObject[1];
     public GameObject[] introQuad = new GameObject[1];
     public GameObject[] failQuad = new GameObject[1];
@@ -21,9 +22,12 @@ public class SmombieQuest : MonoBehaviour {
     public float animationMaxTime;
     public float animationTime;
     public bool hasSpawned = false;
+    public SmombieSpawnPoint spawnPoint;
 
-    public void spawnAt(SmombieSpawnPoint spawnPoint)
+    public void spawnAt(SmombieSpawnPoint spawn)
     {
+        spawnPoint = spawn;
+        state = -1;
         if (isFotoQuest)
         {
             transform.position = spawnPoint.fotoSpawnPoint.transform.position;
@@ -36,13 +40,18 @@ public class SmombieQuest : MonoBehaviour {
         }
         spawnPoint.activationTrigger.onTrigger = handleActivation; 
         spawnPoint.crashTrigger.onTrigger = handleCrash;
-        if (spawnPoint.isRightHandSide)
+        // take care of textures and motions beeing mirrored
+        if (isMirrored != spawnPoint.isRightHandSide)
         {
-            isMirrored = true;
-            // take care of textures and motions beeing mirrored
+            Vector3 ls = gameObject.transform.localScale;
+            ls.z *= -1;
+            gameObject.transform.localScale = ls;
+            isMirrored = spawnPoint.isRightHandSide;
         }
+
         hasSpawned = true;
         reset();
+        gameObject.SetActive(true);
     }
 
     public void handleCrash()
@@ -67,21 +76,51 @@ public class SmombieQuest : MonoBehaviour {
     {
         state = newState;
         //make all objects visible or invisible depending on their state
+        /*
         foreach (GameObject quad in standbyQuad)
         {
-            if (quad != null) quad.SetActive(state == 0);
+            if (quad != null) quad.SetActive(false);
         }
         foreach (GameObject quad in introQuad)
         {
-            if (quad != null) quad.SetActive(state == 1);
+            if (quad != null) quad.SetActive(false);
         }
         foreach (GameObject quad in failQuad)
         {
-            if (quad != null) quad.SetActive(state == 2);
+            if (quad != null) quad.SetActive(false);
         }
         foreach (GameObject quad in passQuad)
         {
-            if (quad != null) quad.SetActive(state == 3);
+            if (quad != null) quad.SetActive(false);
+        }
+        */
+        switch (newState)
+        {
+            case 0:
+                foreach (GameObject quad in standbyQuad)
+                {
+                    if (quad != null) quad.SetActive(true);
+                }
+                break;
+            case 1:
+                foreach (GameObject quad in introQuad)
+                {
+                    if (quad != null) quad.SetActive(true);
+                }
+                break;
+            case 2:
+                foreach (GameObject quad in failQuad)
+                {
+                    if (quad != null) quad.SetActive(true);
+                }
+                break;
+            case 3:
+                foreach (GameObject quad in passQuad)
+                {
+                    if (quad != null) quad.SetActive(true);
+                }
+                break;
+
         }
     }
 

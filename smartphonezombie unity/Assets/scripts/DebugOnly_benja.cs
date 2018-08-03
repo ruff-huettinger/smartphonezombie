@@ -12,7 +12,7 @@ public class DebugOnly_benja : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         debugManager = FindObjectOfType<DebugInfo_benja>();
-		//Debug.Log("main script " + mainScript.name);
+		Debug.Log("debug info on " + debugManager.name);
 		onDebugChange(false);
         connect(true);
     }
@@ -20,8 +20,11 @@ public class DebugOnly_benja : MonoBehaviour {
     public void connect(bool shouldBeConnected)
     {
 		if(isConnected == shouldBeConnected) return;
-		if(shouldBeConnected) debugManager.onDebugChange += this.onDebugChange;
-		else debugManager.onDebugChange -= this.onDebugChange;
+        if (shouldBeConnected) {
+            if (debugManager == null) Start();
+            debugManager.onDebugChange += this.onDebugChange;
+        }
+        else debugManager.onDebugChange -= this.onDebugChange;
 		isConnected = shouldBeConnected;
     }
 

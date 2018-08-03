@@ -6,7 +6,8 @@ public class SmombieSpawnPoint : MonoBehaviour {
 
     public bool isRightHandSide = false;
     public bool acceptsStreetQuest = false;
-    public bool acceptsCornerQuest = false;
+    public bool acceptsCrossingQuest = false;
+    public bool acceptsCarrierQuest = false;
     public bool acceptsHouseQuest = false;
     public bool acceptsFotoQuest = false;
     public TriggerChecker activationTrigger;

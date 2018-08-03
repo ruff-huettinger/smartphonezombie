@@ -2,22 +2,164 @@
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 
 public class SmombieQuestManager : MonoBehaviour {
 
+    public SmombieQuest[] quests;
+    public SmombieSpawnPoint[] spawns;
+    int fotoQuestsMax = 1;
+    int streetQuestsMax = 99;
+    int crossingQuestsMax = 99;
+    int carrierQuestsMax = 1;
+    int houseQuestsMax = 99;
+    public int spawnsSold = 0;
 
- 
+    [SerializeField]
+    class questList
+    {
+        List<SmombieQuest> quests = new List<SmombieQuest>();
+        int questsUsed = 0;
+        int questsMax = 0;
+
+        public questList(int maximumAvailable)
+        {
+            questsMax = maximumAvailable;
+            questsUsed = 0;
+        }
+
+        public void Add(SmombieQuest newQuest)
+        {
+            quests.Add(newQuest);
+        }
+
+        public bool spawn(SmombieSpawnPoint spawn)
+        {
+            
+            if (questsMax > questsUsed)
+            {
+                //spawn a random quest:
+                int q = Random.Range(0, quests.Count - 1);
+                quests[q].spawnAt(spawn);
+                quests.RemoveAt(q);
+                return true;
+            }
+            return false;
+        }
+        
+
+    }
 
 	// Use this for initialization
-	void Start () {
+	void Start ()
+    {
+        quests = GetComponentsInChildren<SmombieQuest>();
+        spawns = GetComponentsInChildren<SmombieSpawnPoint>();
+
+        Reset();
+    }
+
+    private void Reset()
+    {
+        distributeQuests();
+    }
+
+
+    // Update is called once per frame
+    void Update () {
 		
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
+    public void distributeQuests()
+    {
+        List<SmombieSpawnPoint> spawnsAvailable;
+        questList fotoQuests = new questList(fotoQuestsMax);
+        questList streetQuests = new questList(streetQuestsMax);
+        questList crossingQuests = new questList(crossingQuestsMax);
+        questList carrierQuests = new questList(carrierQuestsMax);
+        questList houseQuests = new questList(houseQuestsMax);
+        foreach (SmombieQuest quest in quests)
+        {
+            // sort all quests into questlists
+            quest.gameObject.SetActive(false);
+            if (quest.isFotoQuest)
+            {
+                fotoQuests.Add(quest);
+            }
+            else if (quest.isCrossingQuest)
+            {
+                crossingQuests.Add(quest);
+            }
+            else if (quest.isCarrierQuest)
+            {
+                carrierQuests.Add(quest);
+            }
+            else if (quest.isStreetQuest)
+            {
+                streetQuests.Add(quest);
+            }
+            else if (quest.isHouseQuest)
+            {
+                houseQuests.Add(quest);
+            }
+            
+        }
+
+        spawnsAvailable = spawns.ToList<SmombieSpawnPoint>();
+        spawnsSold = 0;
+
+        // loop one time for each spawnpoint even if it is picked in random order
+        int loopcount = Mathf.Min(spawns.Length, quests.Length);
+        for (int j = 0; j < loopcount; j++)
+        {
+            //fetch a random spawn point:
+            int s = Random.Range(0, spawnsAvailable.Count-1);
+            bool spawnSold = false;
+            
+            //try to sell it to random quests in order of importance of questtype
+            if (!spawnSold && spawnsAvailable[s].acceptsCarrierQuest )
+            {
+            // if the spawn function works we're done here, if not, we will ask the next spawn type
+                spawnSold = carrierQuests.spawn(spawnsAvailable[s]);
+            }
+            else if (!spawnSold && spawnsAvailable[s].acceptsCrossingQuest )
+            {
+            // if the spawn function works we're done here, if not, we will ask the next spawn type
+                spawnSold = crossingQuests.spawn(spawnsAvailable[s]);
+            }
+            else if (!spawnSold && spawnsAvailable[s].acceptsHouseQuest )
+            {
+            // if the spawn function works we're done here, if not, we will ask the next spawn type
+                spawnSold = houseQuests.spawn(spawnsAvailable[s]);
+            }
+            else if (!spawnSold && spawnsAvailable[s].acceptsStreetQuest )
+            {
+                // if the spawn function works we're done here, if not, we will ask the next spawn type
+                spawnSold = streetQuests.spawn(spawnsAvailable[s]);
+            }
+            else if (!spawnSold && spawnsAvailable[s].acceptsFotoQuest )
+            {
+                // if the spawn function works we're done here, if not we will delete the spawnpoint anyway to not pick it again
+                spawnSold = fotoQuests.spawn(spawnsAvailable[s]);
+            }
+            if (spawnSold)
+                spawnsSold++;
+            
+            spawnsAvailable[s].gameObject.name = "spawn point " + s;
+            spawnsAvailable.RemoveAt(s);
+        }
+
+
+        /* distributeQuestType(ref fotoQuests);
+         distributeQuestType(ref houseQuests);
+         distributeQuestType(ref carrierQuests);
+         distributeQuestType(ref streetQuests);*/
+    }
+
+
+
+
 
     /*
 
@@ -27,9 +169,9 @@ public class SmombieQuestManager : MonoBehaviour {
 
 
 	public staticquestacle[] streetQuestLib = new staticquestacle[12] ; // all available questacles in the street
-    public staticquestacle[] cornerquestacleLib = new staticquestacle[12];   // all available Quests on corners
+    public staticquestacle[] carrierquestacleLib = new staticquestacle[12];   // all available Quests on carriers
     public staticquestacle[] fotoQuestLib = new staticquestacle[3]; // all available foto Quests
-    public Transform[] cornerSpawnPointLib;
+    public Transform[] carrierSpawnPointLib;
     public Transform[] streetSpawnPointLib;
     public Transform[] fotoSpawnpointLib;
     public staticquestacle fotoQuestInGame;
@@ -40,7 +182,7 @@ public class SmombieQuestManager : MonoBehaviour {
 	public Delegate onLevelAwake;
 
 
-
+    
 
 	[System.Serializable]
 	public class staticquestacle

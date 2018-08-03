@@ -229,7 +229,49 @@ public class smoothVector3{
 		return ints;
 	}
 
-	public static void randomizeArray(GameObject[] Array)
+    public static void randomizeArray(int[] Array)
+    {
+        {
+            // Knuth shuffle algorithm :: courtesy of Wikipedia :)
+            for (int t = 0; t < Array.Length; t++)
+            {
+                int tmp = Array[t];
+                int r = Random.Range(t, Array.Length);
+                Array[t] = Array[r];
+                Array[r] = tmp;
+            }
+        }
+
+    }
+
+    public static int[] intArray(int min, int maxPlusOne)
+    {
+        int[] newArray = new int[maxPlusOne -min];
+        for (int i = 0; i < newArray.Length; i++)
+        {
+            newArray[i] = i + min;
+        }
+        return newArray;
+    }
+
+    public static int[] repeatArray(int[] Array, int newLength)
+    {
+        if (newLength < 1)
+            return null;
+        int[] newArray = new int[newLength];
+        // Knuth shuffle algorithm :: courtesy of Wikipedia :)
+        int i = 0;
+        for (int t = 0; t < newArray.Length; t++)
+        {
+            newArray[t] = Array[i];
+        i++;
+        if (i >= Array.Length)
+            i = 0;
+        }
+        return newArray;
+    }
+
+    public static void randomizeArray(GameObject[] Array)
 	{
 	    {
         // Knuth shuffle algorithm :: courtesy of Wikipedia :)
@@ -244,7 +286,21 @@ public class smoothVector3{
 		
 	}
 
-	static public GameObject[] cleanUpArray(GameObject[] Array)
+    public static void randomizeArray(ArrayList Array)
+    {
+        {
+            // Knuth shuffle algorithm :: courtesy of Wikipedia :)
+            for (int t = 0; t < Array.Count; t++)
+            {
+                var tmp = Array[t];
+                int r = Random.Range(t, Array.Count);
+                Array[t] = Array[r];
+                Array[r] = tmp;
+            }
+        }
+    }
+
+    static public GameObject[] cleanUpArray(GameObject[] Array)
 	{
 		
 		int j=0;

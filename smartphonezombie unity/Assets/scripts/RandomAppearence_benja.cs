@@ -8,20 +8,21 @@ public class RandomAppearence_benja : MonoBehaviour {
 
     public Material[] materials;
     public bool changeMaterials = false;
-    private MeshRenderer rendi;
+    public MeshRenderer rendi;
 
     public Mesh[] meshes;
     public bool changeMeshes = false;
-    private MeshFilter meshi;
+    public MeshFilter meshi;
 
     public Vector3[] posOffsets;
     public bool changePosition = false;
-    private Vector3 posOriginal;
+    public Vector3 posOriginal;
 
     public Vector3[] rotOffsets;
     public bool changeRotations = false;
-    private Vector3 rotOriginal;
+    public Vector3 rotOriginal;
 
+    public float propabilityOfExistance = 1f;
 
     // Use this for initialization
     void Start () {
@@ -37,45 +38,54 @@ public class RandomAppearence_benja : MonoBehaviour {
 		return (int) Mathf.Floor(Random.value*(float)(i+0.999999f));
 	}
 
-	    // Update is called once per frame
-	void Update ()
+    public void randomizeAppearance()
     {
-	    if(changeNow)
-	    {
-		    changeNow=false;
-		    if(changeMeshes && meshes.Length>1)
-		    {
-			    int i = randomInt(meshes.Length-1);
-			    if(meshes[i]!=null)
-			    {
-				    meshi.mesh=meshes[i];
-			    }
-		    }
-		    if(changeMaterials && materials.Length>1)
-		    {
-			    int i = randomInt(materials.Length-1);
-			    if(materials[i]!=null)
-			    {
-				    rendi.material=materials[i];
-			    }
-		    }
-        	if(changePosition && posOffsets.Length>1)
-		    {
-			    int i = randomInt(posOffsets.Length-1);
-			    if(posOffsets[i]!=null)
-			    {
-                    transform.localPosition = posOriginal + posOffsets[i];
-			    }
-		    }
-            if (changeRotations && rotOffsets.Length > 1)
+        changeNow = false;
+        if (changeMeshes && meshes.Length > 1)
+        {
+            int i = randomInt(meshes.Length - 1);
+            if (meshes[i] != null)
             {
-                int i = randomInt(rotOffsets.Length - 1);
-                if (rotOffsets[i] != null)
-                {
-
-                    transform.localEulerAngles = rotOriginal + rotOffsets[i];
-                }
+                meshi.mesh = meshes[i];
             }
         }
-	}
+        if (changeMaterials && materials.Length > 1)
+        {
+            int i = randomInt(materials.Length - 1);
+            if (materials[i] != null)
+            {
+                rendi.material = materials[i];
+            }
+        }
+        if (changePosition && posOffsets.Length > 1)
+        {
+            int i = randomInt(posOffsets.Length - 1);
+            if (posOffsets[i] != null)
+            {
+                transform.localPosition = posOriginal + posOffsets[i];
+            }
+        }
+        if (changeRotations && rotOffsets.Length > 1)
+        {
+            int i = randomInt(rotOffsets.Length - 1);
+            if (rotOffsets[i] != null)
+            {
+
+                transform.localEulerAngles = rotOriginal + rotOffsets[i];
+            }
+        }
+        Mathf.Clamp01(propabilityOfExistance);
+        if (propabilityOfExistance < 1)
+        {
+            rendi.enabled = Random.value < propabilityOfExistance;
+        }
+    }
+
+    // Update is called once per frame
+    void Update ()
+    {
+        if (changeNow) randomizeAppearance();
+
+
+    }
 }
