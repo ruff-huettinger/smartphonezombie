@@ -5,15 +5,16 @@ using System.Collections.Generic;
 using System.Linq;
 
 
-public class SmombieQuestManager : MonoBehaviour {
+public class SmombieQuestManager : MonoBehaviour
+{
 
     public SmombieQuest[] quests;
     public SmombieSpawnPoint[] spawns;
-    int fotoQuestsMax = 1;
-    int streetQuestsMax = 99;
-    int crossingQuestsMax = 99;
-    int carrierQuestsMax = 1;
-    int houseQuestsMax = 99;
+    public int fotoQuestsMax = 1;
+    public int streetQuestsMax = 99;
+    public int crossingQuestsMax = 99;
+    public int carrierQuestsMax = 1;
+    public int houseQuestsMax = 99;
     public int spawnsSold = 0;
 
     [SerializeField]
@@ -36,23 +37,24 @@ public class SmombieQuestManager : MonoBehaviour {
 
         public bool spawn(SmombieSpawnPoint spawn)
         {
-            
-            if (questsMax > questsUsed)
+
+            if (questsMax > questsUsed && quests.Count > 0)
             {
                 //spawn a random quest:
                 int q = Random.Range(0, quests.Count - 1);
                 quests[q].spawnAt(spawn);
                 quests.RemoveAt(q);
+                questsUsed++;
                 return true;
             }
             return false;
         }
-        
+
 
     }
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    void Start()
     {
         quests = GetComponentsInChildren<SmombieQuest>();
         spawns = GetComponentsInChildren<SmombieSpawnPoint>();
@@ -60,16 +62,17 @@ public class SmombieQuestManager : MonoBehaviour {
         Reset();
     }
 
-    private void Reset()
+    public void Reset()
     {
         distributeQuests();
     }
 
 
     // Update is called once per frame
-    void Update () {
-		
-	}
+    void Update()
+    {
+
+    }
 
     public void distributeQuests()
     {
@@ -83,11 +86,8 @@ public class SmombieQuestManager : MonoBehaviour {
         {
             // sort all quests into questlists
             quest.gameObject.SetActive(false);
-            if (quest.isFotoQuest)
-            {
-                fotoQuests.Add(quest);
-            }
-            else if (quest.isCrossingQuest)
+
+            if (quest.isCrossingQuest)
             {
                 crossingQuests.Add(quest);
             }
@@ -103,50 +103,59 @@ public class SmombieQuestManager : MonoBehaviour {
             {
                 houseQuests.Add(quest);
             }
-            
+            else if (quest.isFotoQuest)
+            {
+                fotoQuests.Add(quest);
+            }
+
         }
 
         spawnsAvailable = spawns.ToList<SmombieSpawnPoint>();
         spawnsSold = 0;
 
         // loop one time for each spawnpoint even if it is picked in random order
-        int loopcount = Mathf.Min(spawns.Length, quests.Length);
+        int loopcount = spawns.Length;
         for (int j = 0; j < loopcount; j++)
         {
             //fetch a random spawn point:
-            int s = Random.Range(0, spawnsAvailable.Count-1);
+            int s = Random.Range(0, spawnsAvailable.Count - 1);
             bool spawnSold = false;
-            
+
             //try to sell it to random quests in order of importance of questtype
-            if (!spawnSold && spawnsAvailable[s].acceptsCarrierQuest )
+            if (!spawnSold && spawnsAvailable[s].acceptsCarrierQuest)
             {
-            // if the spawn function works we're done here, if not, we will ask the next spawn type
+                // if the spawn function works we're done here, if not, we will ask the next spawn type
                 spawnSold = carrierQuests.spawn(spawnsAvailable[s]);
             }
-            else if (!spawnSold && spawnsAvailable[s].acceptsCrossingQuest )
+
+            if (!spawnSold && spawnsAvailable[s].acceptsCrossingQuest)
             {
-            // if the spawn function works we're done here, if not, we will ask the next spawn type
+                // if the spawn function works we're done here, if not, we will ask the next spawn type
                 spawnSold = crossingQuests.spawn(spawnsAvailable[s]);
             }
-            else if (!spawnSold && spawnsAvailable[s].acceptsHouseQuest )
+
+            if (!spawnSold && spawnsAvailable[s].acceptsHouseQuest)
             {
-            // if the spawn function works we're done here, if not, we will ask the next spawn type
+                // if the spawn function works we're done here, if not, we will ask the next spawn type
                 spawnSold = houseQuests.spawn(spawnsAvailable[s]);
             }
-            else if (!spawnSold && spawnsAvailable[s].acceptsStreetQuest )
+
+            if (!spawnSold && spawnsAvailable[s].acceptsStreetQuest)
             {
                 // if the spawn function works we're done here, if not, we will ask the next spawn type
                 spawnSold = streetQuests.spawn(spawnsAvailable[s]);
             }
-            else if (!spawnSold && spawnsAvailable[s].acceptsFotoQuest )
+
+            if (!spawnSold && spawnsAvailable[s].acceptsFotoQuest)
             {
                 // if the spawn function works we're done here, if not we will delete the spawnpoint anyway to not pick it again
                 spawnSold = fotoQuests.spawn(spawnsAvailable[s]);
             }
+
             if (spawnSold)
                 spawnsSold++;
-            
-            spawnsAvailable[s].gameObject.name = "spawn point " + s;
+
+            spawnsAvailable[s].gameObject.name = "spawn point " + j + (spawnSold ? " sold" : "");
             spawnsAvailable.RemoveAt(s);
         }
 
@@ -156,6 +165,7 @@ public class SmombieQuestManager : MonoBehaviour {
          distributeQuestType(ref carrierQuests);
          distributeQuestType(ref streetQuests);*/
     }
+}
 
 
 
@@ -356,4 +366,4 @@ public class SmombieQuestManager : MonoBehaviour {
 		}
 	}
     /**/
-}
+

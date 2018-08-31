@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class SmombieQuest : MonoBehaviour {
 
+    private const string gameIdPrefix = "0401";
+    public string storyboardId  = "00"; ///04..12
+    public string storyboardSubId = ""; //A,B,C...
     public bool isStreetQuest = false;
     public bool isCrossingQuest = false;
     public bool isCarrierQuest = false;
@@ -27,13 +30,14 @@ public class SmombieQuest : MonoBehaviour {
     public void spawnAt(SmombieSpawnPoint spawn)
     {
         spawnPoint = spawn;
+        spawnPoint.soldToo = this;
         state = -1;
-        if (isFotoQuest)
+       /* if (isFotoQuest)
         {
             transform.position = spawnPoint.fotoSpawnPoint.transform.position;
             transform.rotation = spawnPoint.fotoSpawnPoint.transform.rotation;
         }
-        else
+        else*/
         {
             transform.position = spawnPoint.transform.position;
             transform.rotation = spawnPoint.transform.rotation;
@@ -68,15 +72,17 @@ public class SmombieQuest : MonoBehaviour {
 
     public void reset()
     {
+
         setState(0);
         stopAnimation();
+        if (storyboardId == "0000") Debug.LogError("set storyboard id in " + gameObject.name);
     }
 
     public void setState(int newState)
     {
         state = newState;
         //make all objects visible or invisible depending on their state
-        /*
+
         foreach (GameObject quad in standbyQuad)
         {
             if (quad != null) quad.SetActive(false);
@@ -93,7 +99,7 @@ public class SmombieQuest : MonoBehaviour {
         {
             if (quad != null) quad.SetActive(false);
         }
-        */
+
         switch (newState)
         {
             case 0:

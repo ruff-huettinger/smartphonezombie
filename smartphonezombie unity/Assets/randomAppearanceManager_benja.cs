@@ -71,7 +71,7 @@ public class randomAppearanceManager_benja : MonoBehaviour {
             {
                 if (j < maxObjects)
                 {
-                    int i = Random.RandomRange(0, allObj.Count);
+                    int i = Random.Range(0, allObj.Count);
                     
                     if (changeMaterials)
                     {

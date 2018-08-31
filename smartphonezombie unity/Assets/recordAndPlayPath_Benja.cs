@@ -159,9 +159,14 @@ public class recordAndPlayPath_Benja : MonoBehaviour {
         return returnValue;
     }
 
-    public void stopPlaying()
+    public void stopPlaying(bool returnToStart = false)
     {
         playKeyframes = false;
+        if(returnToStart)
+        {
+            playheadPositionInM = 0;
+            speedInMPerS = 0;
+        }
     }
 
     void Update ()

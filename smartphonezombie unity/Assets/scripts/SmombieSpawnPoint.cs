@@ -12,14 +12,15 @@ public class SmombieSpawnPoint : MonoBehaviour {
     public bool acceptsFotoQuest = false;
     public TriggerChecker activationTrigger;
     public TriggerChecker crashTrigger;
-    public Transform fotoSpawnPoint;
+    //public Transform fotoSpawnPoint;
+    public SmombieQuest soldToo;
 
     //place this spawnpoint exactly where the quest should spawn
     //if it is a foto quest it will use the fotoSpawnPoint instead which is "near the horrizon"
 
     // Use this for initialization
     void Start () {
-		if(activationTrigger == null || crashTrigger == null || fotoSpawnPoint == null)
+		if(activationTrigger == null || crashTrigger == null /*|| fotoSpawnPoint == null*/)
         {
             Debug.LogError("something could not be found in this SmombieSpawnPoint: please apply SpawnPoints and Triggers per Inspector");
         }

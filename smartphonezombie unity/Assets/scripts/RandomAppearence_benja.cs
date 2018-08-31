@@ -21,6 +21,7 @@ public class RandomAppearence_benja : MonoBehaviour {
     public Vector3[] rotOffsets;
     public bool changeRotations = false;
     public Vector3 rotOriginal;
+    private bool initiated = false;
 
     public float propabilityOfExistance = 1f;
 
@@ -30,6 +31,7 @@ public class RandomAppearence_benja : MonoBehaviour {
 		meshi = this.gameObject.GetComponent<MeshFilter>();
         rotOriginal = transform.localEulerAngles;
         posOriginal = transform.localPosition;
+        initiated = true;
 	}
 
 
@@ -41,6 +43,7 @@ public class RandomAppearence_benja : MonoBehaviour {
     public void randomizeAppearance()
     {
         changeNow = false;
+        if (!initiated) Start();
         if (changeMeshes && meshes.Length > 1)
         {
             int i = randomInt(meshes.Length - 1);
@@ -59,20 +62,11 @@ public class RandomAppearence_benja : MonoBehaviour {
         }
         if (changePosition && posOffsets.Length > 1)
         {
-            int i = randomInt(posOffsets.Length - 1);
-            if (posOffsets[i] != null)
-            {
-                transform.localPosition = posOriginal + posOffsets[i];
-            }
+                transform.localPosition = posOriginal + posOffsets[randomInt(posOffsets.Length - 1)];
         }
         if (changeRotations && rotOffsets.Length > 1)
         {
-            int i = randomInt(rotOffsets.Length - 1);
-            if (rotOffsets[i] != null)
-            {
-
-                transform.localEulerAngles = rotOriginal + rotOffsets[i];
-            }
+                transform.localEulerAngles = rotOriginal + rotOffsets[randomInt(rotOffsets.Length - 1)];
         }
         Mathf.Clamp01(propabilityOfExistance);
         if (propabilityOfExistance < 1)

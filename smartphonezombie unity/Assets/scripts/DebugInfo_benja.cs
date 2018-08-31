@@ -65,7 +65,7 @@ public class DebugInfo_benja : MonoBehaviour {
 
 
 
-    void setDebugState(bool debug)
+    public void setDebugState(bool debug)
     {
         debugging = debug;
         onDebugChange(debug);

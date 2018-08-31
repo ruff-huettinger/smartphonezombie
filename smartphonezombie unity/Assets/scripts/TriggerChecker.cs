@@ -7,6 +7,7 @@ public class TriggerChecker : MonoBehaviour {
 
     public delegate void Deli();
     public Deli onTrigger;
+    public bool changeOnTrigger = false;
     
 	// Use this for initialization
 	void Start () {
@@ -15,10 +16,17 @@ public class TriggerChecker : MonoBehaviour {
 
     public void OnTriggerEnter(Collider other)
     {
+        changeOnTrigger = !changeOnTrigger;
         if (onTrigger != null)
         {
             onTrigger();
         }
+        else
+        {
+            Debug.LogWarning("no function attached to onTrigger");
+        }
     }
+
+  
 
 }
