@@ -8,8 +8,6 @@ public class recordAndPlayPath_Benja : MonoBehaviour {
     public GameObject followingObject;
 
 
-
-
     public float keyframeDistance = 0.01f;
     public bool recordKeyframes = false;
     private bool isRecording = false;
@@ -49,7 +47,9 @@ public class recordAndPlayPath_Benja : MonoBehaviour {
         return frame;
         }
 
-    public void eraseKeyframes()
+
+
+    void eraseKeyframes()
     {
         //destroy existing keyframes as gameobjects and as list element
         foreach (GameObject frame in keyframes)
@@ -61,12 +61,12 @@ public class recordAndPlayPath_Benja : MonoBehaviour {
         keyframes.Clear();
     }
 
-    public string keyframeName(float distanceOnPath)
+    string keyframeName(float distanceOnPath)
     {
         return "keyframe " + distanceOnPath.ToString("F3") + "m";
     }
 
-    public bool keyframeByinterpolation(GameObject lastFrame, GameObject nextFrame, float distance)
+    bool keyframeByinterpolation(GameObject lastFrame, GameObject nextFrame, float distance)
         {
             
             float maxdist = Vector3.Distance(lastFrame.transform.position, nextFrame.transform.position);
@@ -138,7 +138,26 @@ public class recordAndPlayPath_Benja : MonoBehaviour {
     {
         return playheadPositionInM / pathDistance;
     }
-    public bool play()
+
+    /// <summary>
+    /// starts playing the keyframes with the current speed
+    /// if fromStart will start playing from first frame
+    /// </summary>
+    /// <param name="fromStart"></param>
+    public void play(bool fromStart = false)
+    {
+        if(fromStart)
+        {
+            returnToStart();
+        }
+        playKeyframes = keepPlaying();
+    }
+
+    /// <summary>
+    /// keeps playing alive
+    /// </summary>
+    /// <returns></returns>
+    bool keepPlaying()
     {
         bool returnValue = true;
         playheadPositionInM += Time.deltaTime * speedInMPerS;
@@ -159,14 +178,30 @@ public class recordAndPlayPath_Benja : MonoBehaviour {
         return returnValue;
     }
 
+    /// <summary>
+    /// stops playing hard
+    /// if returnToStart will set the playhead back on start and speed to 0
+    /// </summary>
+    /// <param name="returnToStart"></param>
     public void stopPlaying(bool returnToStart = false)
     {
         playKeyframes = false;
         if(returnToStart)
         {
-            playheadPositionInM = 0;
-            speedInMPerS = 0;
+            this.returnToStart();
+            keepPlaying();
         }
+        
+    }
+
+
+    /// <summary>
+    /// sets the playhead back on start and sets speed to 0
+    /// </summary>
+    public void returnToStart()
+    {
+        playheadPositionInM = 0;
+        speedInMPerS = 0;
     }
 
     void Update ()
@@ -177,7 +212,7 @@ public class recordAndPlayPath_Benja : MonoBehaviour {
         }
         if (playKeyframes)
         {
-            playKeyframes = play();
+            playKeyframes = keepPlaying();
         }
 
 

@@ -203,15 +203,27 @@ public class smoothVector3{
 		return Mathf.Clamp01(Mathf.SmoothStep(0,1,t));
 	}
 
-	public static float smooth01trigonometrically(float t)
+	public static float easeInOut(float t)
 	{
-		//uses cosinus shape between, input 0..1, output 0..1
-		//return Mathf.Clamp01((1-Mathf.Cos(t*Mathf.PI))/2);
-		return Mathf.Clamp01(Mathf.InverseLerp(1,-1, Mathf.Cos(t*Mathf.PI)));
+        //uses cosinus shape between, input 0..1, output 0..1
+        //return Mathf.Clamp01((1-Mathf.Cos(t*Mathf.PI))/2);
+        t = Mathf.Clamp01(t);
+        return Mathf.InverseLerp(1,-1, Mathf.Cos(t*Mathf.PI));
 	}
 
+    public static float easeIn(float t)
+    {
+        t = Mathf.Clamp01(t);
+        return Mathf.Sin(t * Mathf.PI/2);
+    }
 
-	public int[] randomIntArray(int min, int max, int count)
+    public static float easeOut(float t)
+    {
+        t = Mathf.Clamp01(t);
+        return  1- Mathf.Cos(t * Mathf.PI/2);
+    }
+
+    public int[] randomIntArray(int min, int max, int count)
 	{
 		if(count>max-min)
 		{
@@ -246,7 +258,7 @@ public class smoothVector3{
 
     public static int[] intArray(int min, int maxPlusOne)
     {
-        int[] newArray = new int[maxPlusOne -min];
+        int[] newArray = new int[maxPlusOne - min];
         for (int i = 0; i < newArray.Length; i++)
         {
             newArray[i] = i + min;
@@ -264,9 +276,9 @@ public class smoothVector3{
         for (int t = 0; t < newArray.Length; t++)
         {
             newArray[t] = Array[i];
-        i++;
-        if (i >= Array.Length)
-            i = 0;
+            i++;
+            if (i >= Array.Length)
+                i = 0;
         }
         return newArray;
     }
@@ -324,7 +336,38 @@ public class smoothVector3{
 		return Output;
 	}
 
-	public static Vector3 ClosestPointToIntersect( Vector3 linePoint1, Vector3 lineVec1, Vector3 linePoint2, Vector3 lineVec2){
+    public static float map(float value, float valMin, float valMax, float outMin, float OutMax, bool clamp = false)
+    {
+        value = Mathf.InverseLerp(valMin, valMax, value);
+        if (clamp) value = Mathf.Clamp01(value);
+        return Mathf.Lerp(outMin, OutMax, value);
+    }
+
+    public static float map(float value, float minIn, float maxIn, float minOut, float maxOut, float minClamp, float maxClamp)
+    {
+        return Mathf.Clamp(map(value, minIn, maxIn, minOut, maxOut, false), minClamp, maxClamp);
+    }
+
+    public static float keepAngle0to360(float Angle)
+    {
+        while(Angle<0)
+        { Angle += 360; }
+        while (Angle > 360)
+        { Angle -= 360; }
+        return Angle;
+    }
+
+    public static float keepAngleBetween(float Angle, float Min, float Max)
+    {
+        float temp = Mathf.Lerp(Min, Max, 0.5f);
+        while (Angle < Min-360)
+        { Angle += 360; }
+        while (Angle >  Max + 360)
+        { Angle -= 360; }
+        return Angle;
+    }
+
+    public static Vector3 ClosestPointToIntersect( Vector3 linePoint1, Vector3 lineVec1, Vector3 linePoint2, Vector3 lineVec2){
 
 		float a = Vector3.Dot(lineVec1, lineVec1);
 		float b = Vector3.Dot(lineVec1, lineVec2);
@@ -352,6 +395,11 @@ public class smoothVector3{
 		}
 	}
 
+    /// <summary>
+    /// use ref for currentTime, will be reduced by time since last frame
+    /// </summary>
+    /// <param name="currentTime"></param>
+    /// <returns>true when countdown at zero</returns>
     public static bool countdownToZero(ref float currentTime)
     {
         if (currentTime == 0)
@@ -365,6 +413,17 @@ public class smoothVector3{
             return true;
         }
         return false;
+    }
+
+    /// <summary>
+    /// use ref for currentTime, will be changed
+    /// </summary>
+    /// <param name="currentTime"></param>
+    /// <returns>float between 0 and 1 </returns>
+    public static float timer(ref float currentTime, float maxTime, bool pausing = false)
+    {
+        if(!pausing) currentTime = Mathf.Min(currentTime + Time.deltaTime,maxTime);
+        return Mathf.InverseLerp(0f, maxTime, currentTime);
     }
 
 }

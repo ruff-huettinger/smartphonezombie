@@ -11,14 +11,21 @@ public class SmombieGame : MonoBehaviour {
     SmombieQuestManager questControl;
     recordAndPlayPath_Benja pathControl;
     public float speed;
+    float setSpeedTarget;
+    float overrideSpeedTarget = 0;
+    float speedSmoothing = 0.5f;
     public float pathProgress;
     public randomAppearanceManager_benja[] cityAppearance;
     DebugInfo_benja debugInfo;
     public bool debug = false;
-    public STATE state;
+
     public int currentLevel = 0;
     public delegate void boolDelegate(bool theBool);
     public boolDelegate onDebugChange;
+    public float maxGameTime = 180.0f;          //maximale zeit des spiels 
+    public float gameTime = 0;                   //zeit des spiels (countdown)
+    public bool pausing = false;                // pauses the game
+    public STATE state;
 
 
     public enum STATE
@@ -34,6 +41,15 @@ public class SmombieGame : MonoBehaviour {
         FINISH_TIMEOUT      //2330
     }
 
+    /// <summary>
+    /// will change the current state to the given
+    /// </summary>
+    /// <param name="newState"></param>
+    void changestate(STATE newState)
+    {
+        state = newState;
+        debugInfo.log("state", state.ToString());
+    }
 
     // Use this for initialization
     void Start()
@@ -41,22 +57,67 @@ public class SmombieGame : MonoBehaviour {
         instance = this;
         debugInfo = FindObjectOfType<DebugInfo_benja>();
         onDebugChange += instance.debugInfo.setDebugState;
-        reset();
+        instance.GAMEreset();
     }
 
-
-
-    public void reset()
+    public void GAMEreset()
     {
+        instance.changestate(STATE.RESETTING);
         instance.questControl.Reset();
-       
+        instance.pathControl.stopPlaying(true);
+        foreach (randomAppearanceManager_benja ram in instance.cityAppearance)
+        {
+            ram.randomizeAppearance();
+        }
+        instance.debug = false;
+        instance.onDebugChange(false);
+        instance.gameTime = 0;
+        instance.speed = 0;
+        instance.changestate(STATE.READY);
     }
+
+    public void GAMEstart()
+    {
+        changestate(STATE.ATSTART);
+    }
+
+    public void GAMEstartPlaying()
+    {
+        changestate(STATE.PLAYING);
+        pathControl.play();
+    }
+
+    /// <summary>
+    /// uses this to set the speed in m/s
+    /// </summary>
+    /// <param name="metersPerSecond"></param>
+    public void GAMEsetSpeed(float metersPerSecond)
+    {
+        setSpeedTarget = metersPerSecond;
+    }
+
+    void updateSpeed()
+    {
+
+        speed = Mathf.Lerp(   overrideSpeed ? overrideSpeedTarget : setSpeedTarget
+                            , speed
+                            , speedSmoothing
+                          );
+        pathControl.speedInMPerS = speed;
+    }
+
+    bool overrideSpeed = false;
 
     // Update is called once per frame
     void Update () {
         //pathProgress = pathControl.playheadPosition01();
+        if (state == STATE.PLAYING)
+        {
+            BenjasMath.timer(ref gameTime, maxGameTime, pausing);
+            updateSpeed();
+        }
 
-	}
+    }
 }
 
 /*
