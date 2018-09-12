@@ -10,6 +10,7 @@ public class SmombieGame : MonoBehaviour {
     private static SmombieGame instance;
     SmombieQuestManager questControl;
     recordAndPlayPath_Benja pathControl;
+    public string audioFolder = "";
     public float speed;
     float setSpeedTarget;
     float overrideSpeedTarget = 0;
@@ -51,6 +52,11 @@ public class SmombieGame : MonoBehaviour {
         debugInfo.log("state", state.ToString());
     }
 
+
+    public static SmombieGame GetInstance()
+    {
+        return instance;
+    }
     // Use this for initialization
     void Start()
     {
@@ -177,10 +183,7 @@ public class SmombieGame : MonoBehaviour {
         debugInfo.log("state", state.ToString());
     }
 
-    public static ParagliderGame GetInstance()
-    {
-        return instance;
-    }
+
 
     public void getValuesFromConfig()
     {
