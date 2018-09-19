@@ -7,28 +7,50 @@ public class SmombieQuest : MonoBehaviour {
     private const string gameIdPrefix = "0401";
     public string storyboardId  = "00"; ///04..12
     public string storyboardSubId = ""; //A,B,C...
-    public bool isStreetQuest = false;
-    public bool isCrossingQuest = false;
-    public bool isCarrierQuest = false;
-    public bool isHouseQuest = false;
-    public bool isFotoQuest = false;
+    public QUESTTYPE questtype;
+    public REACTION_FAIL reactionOnFail = REACTION_FAIL.NONE;
     public bool isMirrored = false;
     public bool isAnimated = false;
-   // public int state = -1; //0 = ready, 1= intro (animation), 2= fail, 3= pass;
+    public float animationMaxTime;
+    public float animationTime;
+    public delegate void handler(SmombieQuest quest);
+    public handler onCrash;
+    public handler onEnter;
+    public handler onPass;
+
     public GameObject[] standbyQuad = new GameObject[1];
     public GameObject[] introQuad = new GameObject[1];
-    public GameObject[] failQuad = new GameObject[1];
-    public GameObject[] passQuad = new GameObject[1];
+
     public Transform animatedObject;
     public Transform animationStart;
     public Transform animationEnd;
-    public float animationMaxTime;
-    public float animationTime;
-    public bool hasSpawned = false;
+
+    public GameObject[] failQuad = new GameObject[1];
+    public GameObject[] passQuad = new GameObject[1];
+
     public SmombieSpawnPoint spawnPoint;
     private AudioSource Sound;
     public STATE state;
 
+    public enum REACTION_FAIL
+    {
+        NONE,
+        DELAY, //get delayed by 7 seconds
+        WET, //wet screen for ... seconds
+        DOG, //jumping dog
+        FINALE_DRAWING, // fall into well before Finale crash
+        FINALE_CRASH // end game 2300 unfall (accident)
+    }
+
+    public enum QUESTTYPE
+    {
+        NONE,
+        STREET,
+        CROSSING,
+        CARRIER,
+        HOUSE,
+        FOTO
+    }
 
     public enum STATE
     {
@@ -65,7 +87,7 @@ public class SmombieQuest : MonoBehaviour {
         }
 
 
-        hasSpawned = true;
+        
         reset();
         gameObject.SetActive(true);
         setState(STATE.STANDBY);
@@ -90,45 +112,18 @@ public class SmombieQuest : MonoBehaviour {
        
     }
 
-    public void handleCrash()
-    {
-        if(state != STATE.PASS)
-        setState(STATE.FAIL);
-        stopAnimation();
-    }
-
-    public void handleWait()
-    {
-        if (state != STATE.FAIL)
-            setState(STATE.PASS);
-        stopAnimation();
-    }
-
-
-    public void playAudio(string stateID)
-    {
-        // 0401.S.0530.A
-        string audiofile = SmombieGame.GetInstance().audioFolder;
-        audiofile += "0401.S." + storyboardId + stateID;
-        if (storyboardSubId.Length >0)
-        {
-            audiofile += "." + storyboardSubId;
-        }
-    }
-
-
     public void setState(STATE newState)
     {
         state = newState;
         //make all objects visible or invisible depending on their state
 
-        foreach (GameObject quad in standbyQuad)   if (quad != null) quad.SetActive(false);
-        
+        foreach (GameObject quad in standbyQuad) if (quad != null) quad.SetActive(false);
+
         foreach (GameObject quad in introQuad) if (quad != null) quad.SetActive(false);
-        
+
         foreach (GameObject quad in failQuad) if (quad != null) quad.SetActive(false);
-        
-        foreach (GameObject quad in passQuad)  if (quad != null) quad.SetActive(false);
+
+        foreach (GameObject quad in passQuad) if (quad != null) quad.SetActive(false);
 
         switch (state)
         {
@@ -150,6 +145,35 @@ public class SmombieQuest : MonoBehaviour {
 
     }
 
+    public void playAudio(string stateID)
+    {
+        // 0401.S.0530.A
+        string audiofile = SmombieGame.GetInstance().audioFolder;
+        audiofile += "0401.S." + storyboardId + stateID;
+        if (storyboardSubId.Length > 0)
+        {
+            audiofile += "." + storyboardSubId;
+        }
+    }
+
+
+    public void handleCrash()
+    {
+        if(state != STATE.PASS)
+        setState(STATE.FAIL);
+        stopAnimation();
+        onCrash(this);
+    }
+
+    public void handlePass()
+    {
+        if (state != STATE.FAIL)
+            setState(STATE.PASS);
+        stopAnimation();
+        onPass(this);
+    }
+
+
     public void handleActivation()
     {
         setState(STATE.INTRO);
@@ -157,6 +181,7 @@ public class SmombieQuest : MonoBehaviour {
         {
             startAnimation();
         }
+        onEnter(this);
     }
 
     private bool isAnimating = false;
@@ -173,7 +198,7 @@ public class SmombieQuest : MonoBehaviour {
         {
             setAnimationPosition(animationEnd.position);
             stopAnimation();
-            handleWait();
+            handlePass();
         }
         else
         {

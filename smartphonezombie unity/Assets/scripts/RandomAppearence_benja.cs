@@ -26,7 +26,7 @@ public class RandomAppearence_benja : MonoBehaviour {
     public float propabilityOfExistance = 1f;
 
     // Use this for initialization
-    void Start () {
+    void Awake () {
 		rendi=this.gameObject.GetComponent<MeshRenderer>();
 		meshi = this.gameObject.GetComponent<MeshFilter>();
         rotOriginal = transform.localEulerAngles;
@@ -43,7 +43,7 @@ public class RandomAppearence_benja : MonoBehaviour {
     public void randomizeAppearance()
     {
         changeNow = false;
-        if (!initiated) Start();
+        if (!initiated) Awake();
         if (changeMeshes && meshes.Length > 1)
         {
             int i = randomInt(meshes.Length - 1);

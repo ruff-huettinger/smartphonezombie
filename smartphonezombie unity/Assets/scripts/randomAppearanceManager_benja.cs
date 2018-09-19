@@ -73,9 +73,11 @@ public class randomAppearanceManager_benja : MonoBehaviour {
                 {
                     int i = Random.Range(0, allObj.Count);
                     
-                    if (changeMaterials)
+                    if (changeMaterials )
                     {
-                        allObj[i].rendi.material = materials[mat[j]];
+                        
+                            allObj[i].rendi.material = materials[mat[j]];
+                        
                         
                     }
                     if (changeMeshes)
