@@ -8,19 +8,24 @@ using UnityEngine.UI;
 public class SmombieGame : MonoBehaviour {
 
     private static SmombieGame instance;
-    SmombieQuestManager questControl;
-    recordAndPlayPath_Benja pathControl;
+    public SmombieQuestManager questControl;
+    public recordAndPlayPath_Benja pathControl;
     public string audioFolder = "";
     public float speed;
-    float setSpeedTarget;
+    public float setSpeedTarget;
     float overrideSpeedTarget = 0;
-    float speedSmoothing = 0.5f;
+    public bool delayingPlayer = false;
+    public float delayOnCrash = 7f;
+    public float delayTime;
+    public bool prepareCrashFade = false;
+    public float delayCrashFade = 3f;
+    public float fadeDelayTime = 0f;
+    public float speedSmoothing = 0.5f;
     public float pathProgress;
     public randomAppearanceManager_benja[] cityAppearance;
-    DebugInfo_benja debugInfo;
+    public DebugInfo_benja debugInfo;
     public bool debug = false;
 
-    public int currentLevel = 0;
     public delegate void boolDelegate(bool theBool);
     public boolDelegate onDebugChange;
     public float maxGameTime = 180.0f;          //maximale zeit des spiels 
@@ -52,7 +57,7 @@ public class SmombieGame : MonoBehaviour {
         debugInfo.log("state", state.ToString());
     }
 
-
+    
     public static SmombieGame GetInstance()
     {
         return instance;
@@ -62,35 +67,127 @@ public class SmombieGame : MonoBehaviour {
     {
         instance = this;
         debugInfo = FindObjectOfType<DebugInfo_benja>();
-        onDebugChange += instance.debugInfo.setDebugState;
+        cityAppearance = FindObjectsOfType<randomAppearanceManager_benja>();
         instance.GAMEreset();
+        instance.setDebugState(false);
     }
 
+    public void setDebugState(bool debugState)
+    {
+        debug = debugState;
+        if(onDebugChange!=null) onDebugChange(debugState);
+        debugInfo.setDebugState(debugState);
+    }
+
+    /// <summary>
+    /// set back game to start, randomize appearance of city and randomly distribute quests
+    /// </summary>
     public void GAMEreset()
     {
         instance.changestate(STATE.RESETTING);
-        instance.questControl.Reset();
-        instance.pathControl.stopPlaying(true);
+        
         foreach (randomAppearanceManager_benja ram in instance.cityAppearance)
         {
             ram.randomizeAppearance();
         }
-        instance.debug = false;
-        instance.onDebugChange(false);
+        instance.questControl.Reset();
+        instance.pathControl.stopPlaying(true);
+
+        
+        
+
         instance.gameTime = 0;
         instance.speed = 0;
+        instance.setSpeedTarget = 0;
+
+        instance.delayingPlayer = false;
+        instance.delayTime = 0;
+
+        instance.prepareCrashFade = false;
+        instance.fadeDelayTime = 0f;
+
         instance.changestate(STATE.READY);
     }
 
+    /// <summary>
+    /// set game to start, game timer will not be running!
+    /// </summary>
     public void GAMEstart()
     {
         changestate(STATE.ATSTART);
     }
 
+    /// <summary>
+    /// erally start playing the game including game timer
+    /// </summary>
     public void GAMEstartPlaying()
     {
         changestate(STATE.PLAYING);
         pathControl.play();
+    }
+
+    /// <summary>
+    /// delay on crash without game over
+    /// </summary>
+    public void GAMEdelay()
+    {
+        delayTime = delayOnCrash;
+        delayingPlayer = true;
+    }
+
+    /// <summary>
+    /// call the anoying dog
+    /// </summary>
+    public void GAMEdog()
+    {
+    }
+
+    /// <summary>
+    /// game over due to crash
+    /// </summary>
+    public void GAMEfinaleCrash()
+    {
+
+    }
+
+    /// <summary>
+    /// game over due to falling into the well drawing
+    /// </summary>
+    public void GAMEfinaleDrawing()
+    {
+
+    }
+
+    /// <summary>
+    /// make gadget screen wet
+    /// </summary>
+    public void GAMEwet()
+    {
+        
+    }
+
+    /// <summary>
+    /// game timer run down
+    /// </summary>
+    public void GAMEtimeout()
+    {
+       
+    }
+
+    /// <summary>
+    /// reach end, friends there, happy end
+    /// </summary>
+    public void GAMEfinaleFriends()
+    {
+        
+    }
+
+    /// <summary>
+    /// reach end, friends gone
+    /// </summary>
+    public void GAMEfinaleNoFriends()
+    {
+
     }
 
     /// <summary>
@@ -112,7 +209,48 @@ public class SmombieGame : MonoBehaviour {
         pathControl.speedInMPerS = speed;
     }
 
-    bool overrideSpeed = false;
+    public bool overrideSpeed = false;
+
+    bool hotkeysToDebug = true;
+
+    void cheatkeys()
+    {
+        if (hotkeysToDebug)
+        {
+            hotkeysToDebug = false;
+            debugInfo.log(": CHEATKEYS", "",true);
+            debugInfo.log("[ D ]", "toggle Debug",true);
+            debugInfo.log("[1] / [2]", "spped +/-",true);
+            debugInfo.log("[ Q ]", "reset",true);
+            debugInfo.log("[ W ]", "go to start",true);
+            debugInfo.log("[ E ]", "start playing",true);
+
+        }
+        if (Input.GetKeyDown("d"))
+        {
+            setDebugState(!debug);
+        }
+        if (Input.GetKeyDown("1"))
+        {
+            GAMEsetSpeed(speed - .1f);
+        }
+        if (Input.GetKeyDown("2"))
+        {
+            GAMEsetSpeed(speed + .1f);
+        }
+        if (Input.GetKeyDown("q"))
+        {
+            GAMEreset();
+        }
+        if (Input.GetKeyDown("w"))
+        {
+            GAMEstart();
+        }
+        if (Input.GetKeyDown("e"))
+        {
+            GAMEstartPlaying();
+        }
+    }
 
     // Update is called once per frame
     void Update () {
@@ -122,6 +260,7 @@ public class SmombieGame : MonoBehaviour {
             BenjasMath.timer(ref gameTime, maxGameTime, pausing);
             updateSpeed();
         }
+        cheatkeys();
 
     }
 }

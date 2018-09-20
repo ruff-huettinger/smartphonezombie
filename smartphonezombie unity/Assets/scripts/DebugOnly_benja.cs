@@ -12,7 +12,7 @@ public class DebugOnly_benja : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         debugManager = FindObjectOfType<DebugInfo_benja>();
-		Debug.Log("debug info on " + debugManager.name);
+		//Debug.Log("debug info on " + debugManager.name);
 		onDebugChange(false);
         connect(true);
     }

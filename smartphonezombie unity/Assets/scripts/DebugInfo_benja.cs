@@ -21,12 +21,14 @@ public class DebugInfo_benja : MonoBehaviour {
 
     public void log(string name, float value)
     {
+        
         log(name, (Mathf.Round(value*100)/100).ToString());
     }
 
-    public void log(string name, string value)
+    public void log(string name, string value, bool forceUpdate = false)
     {
-        if (debugging)
+        
+        if (debugging || forceUpdate)
         {
             int index = names.IndexOf(name);
             if (index < 0)
@@ -34,7 +36,6 @@ public class DebugInfo_benja : MonoBehaviour {
             values[index] = value;
             doUpdate = true;
         }
-        
     }
 
     int addLine(string name)
@@ -54,8 +55,8 @@ public class DebugInfo_benja : MonoBehaviour {
     }
     // Update is called once per frame
     void Update () {
-        
-        if(doUpdate && debugging)
+     
+        if (doUpdate && debugging)
         {
             doUpdate = false;
             updateText();

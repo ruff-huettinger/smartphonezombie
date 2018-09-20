@@ -54,17 +54,80 @@ public class SmombieQuestManager : MonoBehaviour
     }
 
     // Use this for initialization
-    void Start()
+    void Awake()
     {
         quests = GetComponentsInChildren<SmombieQuest>();
+
         spawns = GetComponentsInChildren<SmombieSpawnPoint>();
 
-        Reset();
+       // Reset();
     }
 
     public void Reset()
     {
+        Debug.Log("resetting quests");
         distributeQuests();
+        foreach (SmombieQuest quest in quests)
+        {
+            quest.onCrash = onQuestFail;
+            quest.onPass = onQuestPass;
+            quest.onEnter = onQuestEnter;
+        }
+    }
+
+    /// <summary>
+    /// this will be called on a quest fail and manage the reaction
+    /// grab the finale texts here too
+    /// </summary>
+    /// <param name="quest"></param>
+    public void onQuestFail(SmombieQuest quest)
+    {
+        Debug.Log("fail detected by quest " + quest.name);
+        switch (quest.reactionOnFail)
+        {
+            case SmombieQuest.REACTION_FAIL.DELAY:
+                SmombieGame.GetInstance().GAMEdelay();
+                break;
+
+            case SmombieQuest.REACTION_FAIL.DOG:
+                SmombieGame.GetInstance().GAMEdog();
+                break;
+
+            case SmombieQuest.REACTION_FAIL.WET:
+                SmombieGame.GetInstance().GAMEwet();
+                break;
+
+            case SmombieQuest.REACTION_FAIL.FINALE_CRASH:
+                SmombieGame.GetInstance().GAMEfinaleCrash();
+                break;
+
+            case SmombieQuest.REACTION_FAIL.FINALE_DRAWING:
+                SmombieGame.GetInstance().GAMEfinaleDrawing();
+                break;
+
+        }
+    }
+
+    /// <summary>
+    /// this will be called when a quest is getting activated, especially interesting for photo quests
+    /// </summary>
+    /// <param name="quest"></param>
+    public void onQuestEnter(SmombieQuest quest)
+    {
+        Debug.Log("enter detected by quest " + quest.name);
+        if (quest.questtype == SmombieQuest.QUESTTYPE.FOTO)
+        {
+            Debug.LogError("handle foto quest here");
+        }
+    }
+
+    /// <summary>
+    /// called on quest pass, call finale texts here too
+    /// </summary>
+    /// <param name="quest"></param>
+    public void onQuestPass(SmombieQuest quest)
+    {
+        Debug.Log("pass detected by quest " + quest.name);
     }
 
 
@@ -87,23 +150,23 @@ public class SmombieQuestManager : MonoBehaviour
             // sort all quests into questlists
             quest.gameObject.SetActive(false);
 
-            if (quest.isCrossingQuest)
+            if (quest.questtype == SmombieQuest.QUESTTYPE.CROSSING)
             {
                 crossingQuests.Add(quest);
             }
-            else if (quest.isCarrierQuest)
+            else if (quest.questtype == SmombieQuest.QUESTTYPE.CARRIER)
             {
                 carrierQuests.Add(quest);
             }
-            else if (quest.isStreetQuest)
+            else if (quest.questtype == SmombieQuest.QUESTTYPE.STREET)
             {
                 streetQuests.Add(quest);
             }
-            else if (quest.isHouseQuest)
+            else if (quest.questtype == SmombieQuest.QUESTTYPE.HOUSE)
             {
                 houseQuests.Add(quest);
             }
-            else if (quest.isFotoQuest)
+            else if (quest.questtype == SmombieQuest.QUESTTYPE.FOTO)
             {
                 fotoQuests.Add(quest);
             }
@@ -159,7 +222,7 @@ public class SmombieQuestManager : MonoBehaviour
             spawnsAvailable.RemoveAt(s);
         }
 
-
+        Debug.Log("quests distributed");
         /* distributeQuestType(ref fotoQuests);
          distributeQuestType(ref houseQuests);
          distributeQuestType(ref carrierQuests);
