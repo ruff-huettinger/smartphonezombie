@@ -5,10 +5,14 @@ using UnityEngine;
 public class SmombieQuest : MonoBehaviour {
 
     private const string gameIdPrefix = "0401";
-    public string storyboardId  = "00"; ///04..12
+    public string storyboardId = "00"; ///04..12
     public string storyboardSubId = ""; //A,B,C...
     public QUESTTYPE questtype;
     public REACTION_FAIL reactionOnFail = REACTION_FAIL.NONE;
+    public float delayIntroAfterActivation = 1f;
+    public float timeUntilIntro;
+    public float maxTimeUntilPass = 3f;
+    public float timeUntilPass = 0f;
     public bool isMirrored = false;
     public bool isAnimated = false;
     public float animationMaxTime;
@@ -19,14 +23,15 @@ public class SmombieQuest : MonoBehaviour {
     public handler onPass;
 
     public GameObject[] standbyQuad = new GameObject[1];
+    /// <summary>
+    /// test
+    /// </summary>
     public GameObject[] introQuad = new GameObject[1];
-
+    public GameObject[] failQuad = new GameObject[1];
+    public GameObject[] passQuad = new GameObject[1];
     public Transform animatedObject;
     public Transform animationStart;
     public Transform animationEnd;
-
-    public GameObject[] failQuad = new GameObject[1];
-    public GameObject[] passQuad = new GameObject[1];
 
     public SmombieSpawnPoint spawnPoint;
     private AudioSource Sound;
@@ -56,6 +61,7 @@ public class SmombieQuest : MonoBehaviour {
     {
         NONE,
         STANDBY,
+        ACTIVATION,
         INTRO,
         FAIL,
         PASS
@@ -65,17 +71,17 @@ public class SmombieQuest : MonoBehaviour {
     {
         spawnPoint = spawn;
         spawnPoint.soldToo = this;
-       /* if (isFotoQuest)
-        {
-            transform.position = spawnPoint.fotoSpawnPoint.transform.position;
-            transform.rotation = spawnPoint.fotoSpawnPoint.transform.rotation;
-        }
-        else*/
-        
-            transform.position = spawnPoint.transform.position;
-            transform.rotation = spawnPoint.transform.rotation;
-        
-        spawnPoint.activationTrigger.onTrigger = handleActivation; 
+        /* if (isFotoQuest)
+         {
+             transform.position = spawnPoint.fotoSpawnPoint.transform.position;
+             transform.rotation = spawnPoint.fotoSpawnPoint.transform.rotation;
+         }
+         else*/
+
+        transform.position = spawnPoint.transform.position;
+        transform.rotation = spawnPoint.transform.rotation;
+
+        spawnPoint.activationTrigger.onTrigger = handleActivation;
         spawnPoint.crashTrigger.onTrigger = handleCrash;
         // take care of textures and motions beeing mirrored
         if (isMirrored != spawnPoint.isRightHandSide)
@@ -87,7 +93,7 @@ public class SmombieQuest : MonoBehaviour {
         }
 
 
-        
+
         reset();
         gameObject.SetActive(true);
         setState(STATE.STANDBY);
@@ -96,6 +102,8 @@ public class SmombieQuest : MonoBehaviour {
     public void reset()
     {
         gameObject.SetActive(false);
+        timeUntilPass = maxTimeUntilPass;
+        timeUntilIntro = delayIntroAfterActivation;
         stopAnimation();
         if (storyboardId == "0000") Debug.LogError("set storyboard id in " + gameObject.name);
         if (isAnimated)
@@ -109,7 +117,7 @@ public class SmombieQuest : MonoBehaviour {
             Sound = gameObject.AddComponent<AudioSource>();
         }
         Sound.Stop();
-       
+
     }
 
     public void setState(STATE newState)
@@ -118,29 +126,27 @@ public class SmombieQuest : MonoBehaviour {
         //make all objects visible or invisible depending on their state
 
         foreach (GameObject quad in standbyQuad) if (quad != null) quad.SetActive(false);
-
         foreach (GameObject quad in introQuad) if (quad != null) quad.SetActive(false);
-
         foreach (GameObject quad in failQuad) if (quad != null) quad.SetActive(false);
-
         foreach (GameObject quad in passQuad) if (quad != null) quad.SetActive(false);
 
-        switch (state)
+        if (state == STATE.STANDBY)
         {
-
-            case STATE.STANDBY:
-                foreach (GameObject quad in standbyQuad) if (quad != null) quad.SetActive(true);
-                break;
-            case STATE.INTRO:
-                foreach (GameObject quad in introQuad) if (quad != null) quad.SetActive(true);
-                break;
-            case STATE.FAIL:
-                foreach (GameObject quad in failQuad) if (quad != null) quad.SetActive(true);
-                break;
-            case STATE.PASS:
-                foreach (GameObject quad in passQuad) if (quad != null) quad.SetActive(true);
-                break;
+            foreach (GameObject quad in standbyQuad) if (quad != null) quad.SetActive(true);
         }
+        else if (state == STATE.INTRO || state == STATE.ACTIVATION)
+        { 
+                foreach (GameObject quad in introQuad) if (quad != null) quad.SetActive(true);
+                }
+        else if(state == STATE.FAIL)
+            {
+                foreach (GameObject quad in failQuad) if (quad != null) quad.SetActive(true);
+                }
+        else if(state == STATE.PASS)
+                {
+                    foreach (GameObject quad in passQuad) if (quad != null) quad.SetActive(true);
+                }
+        
 
 
     }
@@ -159,69 +165,100 @@ public class SmombieQuest : MonoBehaviour {
 
     public void handleCrash()
     {
-        if(state != STATE.PASS)
-        setState(STATE.FAIL);
-        stopAnimation();
-        onCrash(this);
+        if (state == STATE.INTRO || state == STATE.ACTIVATION)
+        {
+            setState(STATE.FAIL);
+            //stopAnimation();
+            onCrash(this);
+        }
     }
 
     public void handlePass()
     {
-        if (state != STATE.FAIL)
+        if (state == STATE.INTRO || state == STATE.ACTIVATION)
+        {
             setState(STATE.PASS);
-        stopAnimation();
-        onPass(this);
+            //stopAnimation();
+            onPass(this);
+        }
     }
 
 
     public void handleActivation()
     {
+        setState(STATE.ACTIVATION);
+        onEnter(this);
+
+    }
+
+    public void handleIntro()
+    {
         setState(STATE.INTRO);
-        if(isAnimated)
+        if (isAnimated)
         {
             startAnimation();
         }
-        onEnter(this);
     }
 
     private bool isAnimating = false;
     void startAnimation()
     {
         isAnimating = true;
-        animationTime = animationMaxTime;
-        setAnimationPosition(animationStart.position);
+        animationTime = 0;
+        setAnimationPosition(0);
     }
 
     void doAnimation()
     {
-        if (BenjasMath.countdownToZero(ref animationTime))
+        if (setAnimationPosition(BenjasMath.timer(ref animationTime, animationMaxTime)))
         {
-            setAnimationPosition(animationEnd.position);
             stopAnimation();
-            handlePass();
-        }
-        else
-        {
-            //lerp from end to start because we count down
-            setAnimationPosition(Vector3.Lerp(animationEnd.position, animationStart.position, animationTime / animationMaxTime));
         }
     }
 
-    public void setAnimationPosition(Vector3 position)
+    
+
+    public bool setAnimationPosition(float t)
     {
         if (animatedObject != null)
         {
-            animatedObject.position = position;
+            Mathf.Clamp01(t);
+            animatedObject.position = Vector3.Lerp( animationStart.position, animationEnd.position, t);
         }
+        return t == 1; 
     }
 
-    void stopAnimation()
+    void stopAnimation(bool reset = false)
     {
         isAnimating = false;
+        if (reset) setAnimationPosition(0);
+
     }
 
     void Update()
     {
-        if (isAnimating) doAnimation();
+        
+        if (state == STATE.ACTIVATION)
+        {
+            //wait for delayIntroAfterActivation before going on 
+            if (BenjasMath.countdownToZero(ref timeUntilIntro))
+            {
+                handleIntro();
+            }
+        }
+
+        if (state == STATE.INTRO)
+        {
+            //wait for maxTimeUntilPass before going on 
+            if (BenjasMath.countdownToZero(ref timeUntilPass))
+            {
+                handlePass();
+            }
+        }
+
+        if(isAnimating && (state == STATE.INTRO || state == STATE.PASS || state == STATE.FAIL))
+        {
+            doAnimation();
+        }
     }
 }

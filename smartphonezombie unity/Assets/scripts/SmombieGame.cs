@@ -8,29 +8,49 @@ using UnityEngine.UI;
 public class SmombieGame : MonoBehaviour {
 
     private static SmombieGame instance;
+
     public SmombieQuestManager questControl;
+    public SmombieFinale finaleControl;
+    
+    public randomAppearanceManager_benja[] cityAppearance;
+    public SmombieDog doggy;
+    public DebugInfo_benja debugInfo;
+    public bool debug = false;
+    public delegate void boolDelegate(bool theBool);
+    public boolDelegate onDebugChange;
+
     public recordAndPlayPath_Benja pathControl;
-    public string audioFolder = "";
     public float speed;
+    public float speedSmoothing = 0.5f;
+    public float pathProgress;
     public float setSpeedTarget;
-    float overrideSpeedTarget = 0;
-    public bool delayingPlayer = false;
-    public float delayOnCrash = 7f;
+    public float overrideSpeedTarget = 0;
+
+    public string audioFolder = "";
+
+    public float gametimeBeforeTimeout = 210.0f;          //maximale zeit des spiels
+    public float gametimeBeforeFriends = 180.0f;          //time before friends gone
+    public float gameTime = 0;                   //zeit des spiels (starts at zero)
+    public bool pausing = false;                // pauses the game
+    public bool friendsWaiting = true;
+
+    public bool dogAnoying = false;
+    public float dogAnoyTime = 0;
+    public float dogAnoyTimeMax = 3f;
+
+    public bool handleDelay = false;
+    public float delayTimeOnCrash = 7f;
     public float delayTime;
+
     public bool prepareCrashFade = false;
     public float delayCrashFade = 3f;
     public float fadeDelayTime = 0f;
-    public float speedSmoothing = 0.5f;
-    public float pathProgress;
-    public randomAppearanceManager_benja[] cityAppearance;
-    public DebugInfo_benja debugInfo;
-    public bool debug = false;
 
-    public delegate void boolDelegate(bool theBool);
-    public boolDelegate onDebugChange;
-    public float maxGameTime = 180.0f;          //maximale zeit des spiels 
-    public float gameTime = 0;                   //zeit des spiels (countdown)
-    public bool pausing = false;                // pauses the game
+    public float finishReachedAtMeter = 243;   //no changes to friends accepted after this, otherwise appear or disappear visible
+
+
+
+
     public STATE state;
 
 
@@ -51,7 +71,7 @@ public class SmombieGame : MonoBehaviour {
     /// will change the current state to the given
     /// </summary>
     /// <param name="newState"></param>
-    void changestate(STATE newState)
+    void setState(STATE newState)
     {
         state = newState;
         debugInfo.log("state", state.ToString());
@@ -66,7 +86,10 @@ public class SmombieGame : MonoBehaviour {
     void Start()
     {
         instance = this;
-        debugInfo = FindObjectOfType<DebugInfo_benja>();
+        if (debugInfo == null) debugInfo = FindObjectOfType<DebugInfo_benja>();
+        if (finaleControl == null) finaleControl = FindObjectOfType<SmombieFinale>();
+        if (questControl == null) questControl = FindObjectOfType<SmombieQuestManager>();
+        if (doggy == null) doggy = FindObjectOfType<SmombieDog>();
         cityAppearance = FindObjectsOfType<randomAppearanceManager_benja>();
         instance.GAMEreset();
         instance.setDebugState(false);
@@ -84,29 +107,31 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void GAMEreset()
     {
-        instance.changestate(STATE.RESETTING);
+        instance.setState(STATE.RESETTING);
         
         foreach (randomAppearanceManager_benja ram in instance.cityAppearance)
         {
             ram.randomizeAppearance();
         }
         instance.questControl.Reset();
+        instance.finaleControl.Reset();
         instance.pathControl.stopPlaying(true);
-
-        
-        
 
         instance.gameTime = 0;
         instance.speed = 0;
         instance.setSpeedTarget = 0;
+        instance.overrideSpeed = false;
 
-        instance.delayingPlayer = false;
+        instance.handleDelay = false;
         instance.delayTime = 0;
 
         instance.prepareCrashFade = false;
         instance.fadeDelayTime = 0f;
 
-        instance.changestate(STATE.READY);
+        instance.dogAnoying = false;
+        instance.dogAnoyTime = 0;
+
+        instance.setState(STATE.READY);
     }
 
     /// <summary>
@@ -114,7 +139,7 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void GAMEstart()
     {
-        changestate(STATE.ATSTART);
+        setState(STATE.ATSTART);
     }
 
     /// <summary>
@@ -122,7 +147,8 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void GAMEstartPlaying()
     {
-        changestate(STATE.PLAYING);
+        setState(STATE.PLAYING);
+
         pathControl.play();
     }
 
@@ -131,8 +157,8 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void GAMEdelay()
     {
-        delayTime = delayOnCrash;
-        delayingPlayer = true;
+        delayTime = delayTimeOnCrash;
+        handleDelay = true;
     }
 
     /// <summary>
@@ -140,22 +166,19 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void GAMEdog()
     {
+        dogAnoying = true;
+        dogAnoyTime = 0;
+        finaleControl.dogNewFriend();
+        doggy.DOGstart();
     }
 
-    /// <summary>
-    /// game over due to crash
-    /// </summary>
-    public void GAMEfinaleCrash()
+    void updateDog()
     {
-
-    }
-
-    /// <summary>
-    /// game over due to falling into the well drawing
-    /// </summary>
-    public void GAMEfinaleDrawing()
-    {
-
+        dogAnoying = !BenjasMath.countdownToZero(ref dogAnoyTime);
+        if (!dogAnoying)
+        {
+            doggy.DOGstop();
+        }
     }
 
     /// <summary>
@@ -171,7 +194,23 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void GAMEtimeout()
     {
-       
+        setState(STATE.FINISH_TIMEOUT);
+    }
+
+    /// <summary>
+    /// game over due to crash
+    /// </summary>
+    public void GAMEfinaleCrash()
+    {
+        setState(STATE.FINISH_CRASH);
+    }
+
+    /// <summary>
+    /// game over due to falling into the well drawing
+    /// </summary>
+    public void GAMEfinaleDrawing()
+    {
+        setState(STATE.FINISH_CRASH);
     }
 
     /// <summary>
@@ -179,7 +218,7 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void GAMEfinaleFriends()
     {
-        
+        setState(STATE.FINISH_FRIENDS);
     }
 
     /// <summary>
@@ -187,7 +226,16 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void GAMEfinaleNoFriends()
     {
+        setState(STATE.FINISH_NO_FRIENDS);
+    }
 
+    public void friendsLeave()
+    {
+        if(friendsWaiting)
+        {
+                            finaleControl.friendsLeave();
+                friendsWaiting = false;
+        }
     }
 
     /// <summary>
@@ -220,7 +268,7 @@ public class SmombieGame : MonoBehaviour {
             hotkeysToDebug = false;
             debugInfo.log(": CHEATKEYS", "",true);
             debugInfo.log("[ D ]", "toggle Debug",true);
-            debugInfo.log("[1] / [2]", "spped +/-",true);
+            debugInfo.log("[down] / [ up ]", "spped +/-",true);
             debugInfo.log("[ Q ]", "reset",true);
             debugInfo.log("[ W ]", "go to start",true);
             debugInfo.log("[ E ]", "start playing",true);
@@ -230,13 +278,13 @@ public class SmombieGame : MonoBehaviour {
         {
             setDebugState(!debug);
         }
-        if (Input.GetKeyDown("1"))
+        if (Input.GetKeyDown("down"))
         {
-            GAMEsetSpeed(speed - .1f);
+            GAMEsetSpeed(0);
         }
-        if (Input.GetKeyDown("2"))
+        if (Input.GetKeyDown("up"))
         {
-            GAMEsetSpeed(speed + .1f);
+            GAMEsetSpeed(setSpeedTarget + .5f);
         }
         if (Input.GetKeyDown("q"))
         {
@@ -250,15 +298,53 @@ public class SmombieGame : MonoBehaviour {
         {
             GAMEstartPlaying();
         }
+        if (Input.GetKeyDown("r"))
+        {
+            GAMEdog();
+        }
+        if (Input.GetKeyDown("t"))
+        {
+            
+        }
     }
 
+    
     // Update is called once per frame
     void Update () {
         //pathProgress = pathControl.playheadPosition01();
         if (state == STATE.PLAYING)
         {
-            BenjasMath.timer(ref gameTime, maxGameTime, pausing);
+            if( BenjasMath.timer(ref gameTime, gametimeBeforeTimeout, pausing)>=1 )
+            {
+                GAMEtimeout();
+            }
+
+            if (friendsWaiting
+                && gameTime > gametimeBeforeFriends
+                && pathProgress < finishReachedAtMeter)
+            {
+                friendsLeave();
+            }
+
+            if ( pathControl.playheadPosition01() >= 1)
+            {
+                if (friendsWaiting) GAMEfinaleFriends();
+                else GAMEfinaleNoFriends();
+            }
+
+            if (dogAnoying)
+            {
+                updateDog();
+            }
+
+            if (handleDelay)
+            {
+                handleDelay = !BenjasMath.countdownToZero(ref delayTime);
+            }
+            overrideSpeed = handleDelay;
             updateSpeed();
+
+
         }
         cheatkeys();
 
@@ -316,7 +402,7 @@ public class SmombieGame : MonoBehaviour {
         TIMEOUT
     }
 
-    void changestate(STATE newState)
+    void setState(STATE newState)
     {
         state = newState;
         debugInfo.log("state", state.ToString());
@@ -388,7 +474,7 @@ public class SmombieGame : MonoBehaviour {
         instance.gamePause(true);
         instance.finishIsNear = false;
         // state can be used by GameManager to see if main is ready
-        instance.changestate(STATE.RESETTING);
+        instance.setState(STATE.RESETTING);
     }
 
 
@@ -439,7 +525,7 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void gameStart()
     {
-        changestate(STATE.ATSTART);
+        setState(STATE.ATSTART);
         NextLevel();     
         HUD.appearCOMPLETE();
         updateHudTexts();
@@ -458,7 +544,7 @@ public class SmombieGame : MonoBehaviour {
     {
         GameManager.ChangePromptTextInGame(2);//04.00 Welt 1: Steuerung (thermics)
         gamePause(false);
-        changestate(STATE.PLAYING);
+        setState(STATE.PLAYING);
         // set a countdown to spawn afer certain amount of time
         spawnByCollider = false;
         spawnByTime = true;
@@ -496,7 +582,7 @@ public void onCrash()
 {
     debugInfo.log("collider info", "crash");
     if (godmode) return;
-    changestate(STATE.CRASH);
+    setState(STATE.CRASH);
     HUD.appearINFOONLY();
     updateHudTexts();
 
@@ -548,7 +634,7 @@ public void onLevelFinish()
 public void onFinalFinish()
 {
     gamePause();
-    changestate(STATE.FINISH);
+    setState(STATE.FINISH);
     HUD.appearHIDDEN();
     updateHudTexts();
     GameManager.GoToResult(gameTime);

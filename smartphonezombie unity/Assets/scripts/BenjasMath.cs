@@ -397,6 +397,7 @@ public class smoothVector3{
 
     /// <summary>
     /// use ref for currentTime, will be reduced by time since last frame
+    /// returns true when zero is reached, false if not
     /// </summary>
     /// <param name="currentTime"></param>
     /// <returns>true when countdown at zero</returns>

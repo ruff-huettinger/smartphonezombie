@@ -14,6 +14,7 @@ public class recordAndPlayPath_Benja : MonoBehaviour {
     public bool debug = false;
 
     public float pathDistance = 0f;
+    public float playheadPositionInM = 0;
     public bool playKeyframes = false;
     public float speedInMPerS = 0f;
 
@@ -133,7 +134,7 @@ public class recordAndPlayPath_Benja : MonoBehaviour {
 
 
     // Update is called once per frame
-    public float playheadPositionInM = 0;
+
     public float playheadPosition01()
     {
         return playheadPositionInM / pathDistance;
