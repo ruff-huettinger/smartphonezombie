@@ -63,6 +63,12 @@ public class SmombieQuestManager : MonoBehaviour
        // Reset();
     }
 
+    public void setupAudio(string path)
+    {
+       
+        foreach (SmombieQuest quest in quests) quest.setupAudio(path);
+    }
+
     public void Reset()
     {
         Debug.Log("resetting quests");

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.IO.Compression;
 //using IGP;
 
 public class SmombieGame : MonoBehaviour {
@@ -89,11 +90,20 @@ public class SmombieGame : MonoBehaviour {
         if (debugInfo == null) debugInfo = FindObjectOfType<DebugInfo_benja>();
         if (finaleControl == null) finaleControl = FindObjectOfType<SmombieFinale>();
         if (questControl == null) questControl = FindObjectOfType<SmombieQuestManager>();
+
+        questControl.setupAudio( Application.streamingAssetsPath + "/" + audioFolder );
+
+        audioFolder = Application.streamingAssetsPath + "/" + audioFolder ;
         if (doggy == null) doggy = FindObjectOfType<SmombieDog>();
         cityAppearance = FindObjectsOfType<randomAppearanceManager_benja>();
         instance.GAMEreset();
         instance.setDebugState(false);
+
+
     }
+
+
+
 
     public void setDebugState(bool debugState)
     {
@@ -311,6 +321,8 @@ public class SmombieGame : MonoBehaviour {
     
     // Update is called once per frame
     void Update () {
+
+        cheatkeys();
         //pathProgress = pathControl.playheadPosition01();
         if (state == STATE.PLAYING)
         {
@@ -346,7 +358,7 @@ public class SmombieGame : MonoBehaviour {
 
 
         }
-        cheatkeys();
+        
 
     }
 }
