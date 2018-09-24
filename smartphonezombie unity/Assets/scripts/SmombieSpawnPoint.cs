@@ -11,7 +11,7 @@ public class SmombieSpawnPoint : MonoBehaviour {
     public bool acceptsHouseQuest = false;
     public bool acceptsFotoQuest = false;
     public TriggerChecker activationTrigger;
-    public TriggerChecker crashTrigger;
+    public TriggerChecker passTrigger;
     //public Transform fotoSpawnPoint;
     public SmombieQuest soldToo;
 
@@ -20,7 +20,7 @@ public class SmombieSpawnPoint : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-		if(activationTrigger == null || crashTrigger == null /*|| fotoSpawnPoint == null*/)
+		if(activationTrigger == null || passTrigger == null /*|| fotoSpawnPoint == null*/)
         {
             Debug.LogError("something could not be found in this SmombieSpawnPoint: please apply SpawnPoints and Triggers per Inspector");
         }

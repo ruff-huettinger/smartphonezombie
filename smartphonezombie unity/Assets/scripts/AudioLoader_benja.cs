@@ -9,13 +9,33 @@ public class AudioLoader_benja : MonoBehaviour
     [Header("Audio Stuff")]
     public AudioClip audioClip;
     public string filePath = "/Sounds";
-    public string fileName = "mario.wav";
+    public string fileName ="";
 
+    public bool loadAudio = false;
+    public bool testAudio = false;
+    
+    private void Update()
+    {
+        if(loadAudio)
+        {
+            loadAudio = false;
+            filePath = "file://" + Application.streamingAssetsPath + "/" + filePath + "/";
+            StartCoroutine(LoadAudio());
+        }
+        if(testAudio)
+        {
+            testAudio = false;
+            AudioSource source = GetComponent<AudioSource>();
+            source.clip = audioClip;
+            source.Play();     
+        }
+    }
     public void loadAudioClip(string path,string audioFileName)
     {
         filePath = "file://" + path + "/";
+        Debug.Log("filePath " + filePath);
+        Debug.Log("path " + path);
         fileName = audioFileName;
-        Debug.Log("A________________");
         StartCoroutine(LoadAudio());
     }
 

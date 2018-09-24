@@ -41,7 +41,7 @@ public class SmombieQuestManager : MonoBehaviour
             if (questsMax > questsUsed && quests.Count > 0)
             {
                 //spawn a random quest:
-                int q = Random.Range(0, quests.Count - 1);
+                int q = Random.Range(0, quests.Count );
                 quests[q].spawnAt(spawn);
                 quests.RemoveAt(q);
                 questsUsed++;
@@ -112,7 +112,10 @@ public class SmombieQuestManager : MonoBehaviour
                 break;
 
         }
+        SmombieGame.GetInstance().sendCodeForFinalTextCollection(quest.codeForFinaleText);
     }
+
+
 
     /// <summary>
     /// this will be called when a quest is getting activated, especially interesting for photo quests
@@ -125,6 +128,7 @@ public class SmombieQuestManager : MonoBehaviour
         {
             Debug.LogError("handle foto quest here");
         }
+        SmombieGame.GetInstance().sendCodeForFinalTextCollection(quest.codeForFinaleText);
     }
 
     /// <summary>
@@ -134,6 +138,7 @@ public class SmombieQuestManager : MonoBehaviour
     public void onQuestPass(SmombieQuest quest)
     {
         Debug.Log("pass detected by quest " + quest.name);
+        SmombieGame.GetInstance().sendCodeForFinalTextCollection(quest.codeForFinaleText);
     }
 
 

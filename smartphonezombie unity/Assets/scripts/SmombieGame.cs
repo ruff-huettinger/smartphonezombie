@@ -15,6 +15,7 @@ public class SmombieGame : MonoBehaviour {
     
     public randomAppearanceManager_benja[] cityAppearance;
     public SmombieDog doggy;
+    public SmombiePiano piano;
     public DebugInfo_benja debugInfo;
     public bool debug = false;
     public delegate void boolDelegate(bool theBool);
@@ -91,12 +92,15 @@ public class SmombieGame : MonoBehaviour {
         if (finaleControl == null) finaleControl = FindObjectOfType<SmombieFinale>();
         if (questControl == null) questControl = FindObjectOfType<SmombieQuestManager>();
 
+ 
         questControl.setupAudio( Application.streamingAssetsPath + "/" + audioFolder );
-
-        audioFolder = Application.streamingAssetsPath + "/" + audioFolder ;
         if (doggy == null) doggy = FindObjectOfType<SmombieDog>();
+        doggy.Setup(audioFolder);
+        if (piano == null) piano = FindObjectOfType<SmombiePiano>();
+        piano.Setup(audioFolder);
+        //audioFolder = Application.streamingAssetsPath + "/" + audioFolder ;
         cityAppearance = FindObjectsOfType<randomAppearanceManager_benja>();
-        instance.GAMEreset();
+        //instance.GAMEreset();
         instance.setDebugState(false);
 
 
@@ -140,6 +144,8 @@ public class SmombieGame : MonoBehaviour {
 
         instance.dogAnoying = false;
         instance.dogAnoyTime = 0;
+        instance.doggy.DOGstop();
+        instance.piano.Reset();
 
         instance.setState(STATE.READY);
     }
@@ -177,7 +183,7 @@ public class SmombieGame : MonoBehaviour {
     public void GAMEdog()
     {
         dogAnoying = true;
-        dogAnoyTime = 0;
+        dogAnoyTime = dogAnoyTimeMax;
         finaleControl.dogNewFriend();
         doggy.DOGstart();
     }
@@ -199,12 +205,25 @@ public class SmombieGame : MonoBehaviour {
         
     }
 
+    public void sendCodeForFinalTextCollection(string code)
+    {
+        if (code != "")
+        {
+            //Your Code Here
+        }
+    }
+
     /// <summary>
     /// game timer run down
     /// </summary>
     public void GAMEtimeout()
     {
-        setState(STATE.FINISH_TIMEOUT);
+        if (state == STATE.PLAYING)
+        {
+            setState(STATE.FINISH_TIMEOUT);
+            piano.PIANOstart();
+        }
+
     }
 
     /// <summary>
@@ -212,6 +231,7 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void GAMEfinaleCrash()
     {
+        instance.doggy.DOGstop();
         setState(STATE.FINISH_CRASH);
     }
 
@@ -282,7 +302,8 @@ public class SmombieGame : MonoBehaviour {
             debugInfo.log("[ Q ]", "reset",true);
             debugInfo.log("[ W ]", "go to start",true);
             debugInfo.log("[ E ]", "start playing",true);
-
+            debugInfo.log("[ R ]", "the dog", true);
+            debugInfo.log("[ T ]", "timeout", true);
         }
         if (Input.GetKeyDown("d"))
         {
@@ -314,7 +335,7 @@ public class SmombieGame : MonoBehaviour {
         }
         if (Input.GetKeyDown("t"))
         {
-            
+            GAMEtimeout();
         }
     }
 
@@ -323,6 +344,9 @@ public class SmombieGame : MonoBehaviour {
     void Update () {
 
         cheatkeys();
+        debugInfo.log("game time", gameTime);
+        debugInfo.log("speed", speed);
+        debugInfo.log("position (" + pathControl.pathDistance+")",pathControl.playheadPositionInM );
         //pathProgress = pathControl.playheadPosition01();
         if (state == STATE.PLAYING)
         {
@@ -353,12 +377,14 @@ public class SmombieGame : MonoBehaviour {
             {
                 handleDelay = !BenjasMath.countdownToZero(ref delayTime);
             }
-            overrideSpeed = handleDelay;
+            overrideSpeed = handleDelay ;
             updateSpeed();
-
-
         }
-        
+        if (state == STATE.FINISH_CRASH || state == STATE.FINISH_TIMEOUT)
+        {
+            overrideSpeed = true;
+            updateSpeed();
+         }
 
     }
 }

@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class SmombieQuest : MonoBehaviour {
 
+   
     private const string gameIdPrefix = "0401";
+    [Header("storyboard codes")]
     public string storyboardId = "00"; ///04..12
     public string storyboardSubId = ""; //A,B,C...
     public string stateIdIntro ;
@@ -14,21 +16,36 @@ public class SmombieQuest : MonoBehaviour {
     AudioLoader_benja[] audioIntro;
     AudioLoader_benja[] audioPass;
     AudioLoader_benja[] audioFail;
+    public string codeForFinaleTextOnPass = "";
+    public string codeForFinaleTextOnFail = "";
+    public string codeForFinaleTextOnRun = "";
+
+
+
+    [Header("quest details")]
     public QUESTTYPE questtype;
     public REACTION_FAIL reactionOnFail = REACTION_FAIL.NONE;
+
+    [Header("timings")]
     public float delayIntroAfterActivation = 1f;
     public float timeUntilIntro;
     public float maxTimeUntilPass = 3f;
     public float timeUntilPass = 0f;
-    public bool isMirrored = false;
-    public bool isAnimated = false;
+    bool isMirrored = false;
+
+    public ANI startsAnimation = ANI.NEVER;
     public float animationMaxTime;
     public float animationTime;
+    public Transform animatedObject;
+    public Transform animationStart;
+    public Transform animationEnd;
+
     public delegate void handler(SmombieQuest quest);
     public handler onCrash;
     public handler onEnter;
     public handler onPass;
 
+    [Header("objects to be seen")]
     public GameObject[] standbyQuad = new GameObject[1];
     /// <summary>
     /// test
@@ -36,13 +53,13 @@ public class SmombieQuest : MonoBehaviour {
     public GameObject[] introQuad = new GameObject[1];
     public GameObject[] failQuad = new GameObject[1];
     public GameObject[] passQuad = new GameObject[1];
-    public Transform animatedObject;
-    public Transform animationStart;
-    public Transform animationEnd;
 
+
+    [Header("info - dont touch")]
     public SmombieSpawnPoint spawnPoint;
     private AudioSource[] Sounds;
     public STATE state;
+    public string codeForFinaleText = "";
 
     public enum REACTION_FAIL
     {
@@ -64,6 +81,14 @@ public class SmombieQuest : MonoBehaviour {
         FOTO
     }
 
+    public enum ANI
+    {
+        NEVER,
+        ONINTRO,
+        ONPASS,
+        ONFAIL
+    }
+
     public enum STATE
     {
         NONE,
@@ -74,24 +99,24 @@ public class SmombieQuest : MonoBehaviour {
         PASS
     }
 
+    public void Awake()
+    {
+        if (questtype != QUESTTYPE.FOTO) GetComponentInChildren<TriggerChecker>().onTrigger = handleCrash;
+    }
 
 
     public void spawnAt(SmombieSpawnPoint spawn)
     {
         spawnPoint = spawn;
         spawnPoint.soldToo = this;
-        /* if (isFotoQuest)
-         {
-             transform.position = spawnPoint.fotoSpawnPoint.transform.position;
-             transform.rotation = spawnPoint.fotoSpawnPoint.transform.rotation;
-         }
-         else*/
 
         transform.position = spawnPoint.transform.position;
         transform.rotation = spawnPoint.transform.rotation;
 
         spawnPoint.activationTrigger.onTrigger = handleActivation;
-        spawnPoint.crashTrigger.onTrigger = handleCrash;
+        spawnPoint.passTrigger.onTrigger = handleRun;
+
+
         // take care of textures and motions beeing mirrored
         if (isMirrored != spawnPoint.isRightHandSide)
         {
@@ -115,14 +140,18 @@ public class SmombieQuest : MonoBehaviour {
         timeUntilIntro = delayIntroAfterActivation;
         
         if (storyboardId == "0000") Debug.LogError("set storyboard id in " + gameObject.name);
-        if (isAnimated)
+        if (startsAnimation != ANI.NEVER)
         {
             animationEnd.gameObject.SetActive(false);
             animationStart.gameObject.SetActive(false);
             stopAnimation(true);
         }
-        if(Sounds != null) foreach (AudioSource sound in Sounds)  sound.Stop();
+        stopAudio();
+
+
     }
+
+
 
     public void setState(STATE newState)
     {
@@ -141,14 +170,20 @@ public class SmombieQuest : MonoBehaviour {
         else if (state == STATE.INTRO || state == STATE.ACTIVATION)
         { 
             foreach (GameObject quad in introQuad) if (quad != null) quad.SetActive(true);
+            stopAudio();
+            playaudio(audioIntro, true);
         }
         else if(state == STATE.FAIL)
         {
              foreach (GameObject quad in failQuad) if (quad != null) quad.SetActive(true);
+            stopAudio();
+            playaudio(audioFail);
         }
         else if(state == STATE.PASS)
         {
             foreach (GameObject quad in passQuad) if (quad != null) quad.SetActive(true);
+            stopAudio();
+            playaudio(audioPass);
         }
     }
 
@@ -158,7 +193,7 @@ public class SmombieQuest : MonoBehaviour {
         string audiofile = "0401_S_" + storyboardId + stateID;
         if (storyboardSubId.Length > 0)
         {
-            audiofile += "_" + storyboardSubId;
+            audiofile += storyboardSubId;
         }
         return audiofile;
     }
@@ -174,12 +209,33 @@ public class SmombieQuest : MonoBehaviour {
         return audiofile;
     }
 
+    public void playaudio(AudioLoader_benja[] loaders, bool loop = false)
+    {
+        stopAudio();
+        if (loaders != null)
+        {
+            Debug.Log("//////starting audio");
+            for (int i = 0; i < loaders.Length && i < Sounds.Length; i++)
+            {
+                Debug.Log(loaders[i].audioClip.length);
+                Sounds[i].clip = loaders[i].audioClip;
+                //Sounds[i].loop = true;
+                Sounds[i].Play();
+            }
+        }
+    }
+
+    public void stopAudio()
+    {
+        if (Sounds != null) foreach (AudioSource sound in Sounds) sound.Stop();
+    }
+
     public void setupAudio(string AudioFolder)
     {
 
-        if (stateIdIntro.Length == 2) audioIntro = Helpers_benja.findAudioClips(AudioFolder, storryboardCodeFile(stateIdIntro)+"*.wav" );
-        if (stateIdPass.Length == 2) audioPass = Helpers_benja.findAudioClips(AudioFolder, storryboardCodeFile(stateIdPass) + "*.wav");
-        if (stateIdFail.Length == 2) audioFail = Helpers_benja.findAudioClips(AudioFolder, storryboardCodeFile(stateIdFail) + "*.wav");
+        if (stateIdIntro.Length == 2) audioIntro = Helpers_benja.findAudioClips(AudioFolder, storryboardCodeFile(stateIdIntro)+"*.wav" ,gameObject);
+        if (stateIdPass.Length == 2) audioPass = Helpers_benja.findAudioClips(AudioFolder, storryboardCodeFile(stateIdPass) + "*.wav",gameObject);
+        if (stateIdFail.Length == 2) audioFail = Helpers_benja.findAudioClips(AudioFolder, storryboardCodeFile(stateIdFail) + "*.wav",gameObject);
         int audioCounter = 0;
 
         if ( audioIntro!= null) audioCounter = Mathf.Max(audioCounter, audioIntro.Length);
@@ -192,6 +248,7 @@ public class SmombieQuest : MonoBehaviour {
             for (int i = 0; i < audioCounter; i++)
             {
                 Sounds[i] = gameObject.AddComponent<AudioSource>();
+                Sounds[i].playOnAwake = false;
             }
         }
         else Debug.Log(gameObject.name + " has no sounds");
@@ -203,9 +260,15 @@ public class SmombieQuest : MonoBehaviour {
         if (state == STATE.INTRO || state == STATE.ACTIVATION)
         {
             setState(STATE.FAIL);
-            //stopAnimation();
+            if (startsAnimation == ANI.ONFAIL)
+            {
+                startAnimation();
+            }
+            // else stopAnimation();
+            codeForFinaleText = codeForFinaleTextOnFail;
             onCrash(this);
         }
+        
     }
 
     public void handlePass()
@@ -213,7 +276,28 @@ public class SmombieQuest : MonoBehaviour {
         if (state == STATE.INTRO || state == STATE.ACTIVATION)
         {
             setState(STATE.PASS);
-            //stopAnimation();
+            if (startsAnimation == ANI.ONPASS)
+            {
+                startAnimation();
+            }
+            // else stopAnimation();
+            codeForFinaleText = codeForFinaleTextOnPass;
+            onPass(this);
+        }
+
+    }
+
+    public void handleRun()
+    {
+        if (state == STATE.INTRO || state == STATE.ACTIVATION)
+        {
+            setState(STATE.PASS);
+            if (startsAnimation == ANI.ONPASS)
+            {
+                startAnimation();
+            }
+            // else stopAnimation();
+            codeForFinaleText = codeForFinaleTextOnRun;
             onPass(this);
         }
     }
@@ -221,15 +305,18 @@ public class SmombieQuest : MonoBehaviour {
 
     public void handleActivation()
     {
-        setState(STATE.ACTIVATION);
-        onEnter(this);
+        if (state == STATE.STANDBY)
+        {
+            setState(STATE.ACTIVATION);
+            onEnter(this);
+        }
 
     }
 
     public void handleIntro()
     {
         setState(STATE.INTRO);
-        if (isAnimated)
+        if (startsAnimation == ANI.ONINTRO)
         {
             startAnimation();
         }
