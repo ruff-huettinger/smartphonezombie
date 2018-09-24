@@ -16,9 +16,4 @@ public class TransformAtStart : MonoBehaviour {
         transform.localPosition = new Vector3(x, y, z);
         transform.localEulerAngles = new Vector3(r, 0, 0);
     }
-
-    // Update is called once per frame
-    void Update () {
-		
-	}
 }
