@@ -100,7 +100,7 @@ public class SmombieGame : MonoBehaviour {
         piano.Setup(audioFolder);
         //audioFolder = Application.streamingAssetsPath + "/" + audioFolder ;
         cityAppearance = FindObjectsOfType<randomAppearanceManager_benja>();
-        //instance.GAMEreset();
+        instance.GAMEreset();
         instance.setDebugState(false);
 
 
