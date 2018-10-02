@@ -217,7 +217,7 @@ public class SmombieQuest : MonoBehaviour {
             Debug.Log("//////starting audio");
             for (int i = 0; i < loaders.Length && i < Sounds.Length; i++)
             {
-                Debug.Log(loaders[i].audioClip.length);
+
                 Sounds[i].clip = loaders[i].audioClip;
                 //Sounds[i].loop = true;
                 Sounds[i].Play();
