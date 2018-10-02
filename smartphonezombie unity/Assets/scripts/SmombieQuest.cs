@@ -99,9 +99,16 @@ public class SmombieQuest : MonoBehaviour {
         PASS
     }
 
-    public void Awake()
+    public void Start()
     {
-        if (questtype != QUESTTYPE.FOTO) GetComponentInChildren<TriggerChecker>().onTrigger = handleCrash;
+        if (questtype != QUESTTYPE.FOTO)
+        {
+            TriggerChecker CrashTrigger = GetComponentInChildren<TriggerChecker>();
+            if (CrashTrigger != null && CrashTrigger.gameObject.name == "crashTrigger")
+                CrashTrigger.onTrigger = handleCrash;
+            else
+                Debug.Log("//////////////// Warning, quest lacks crashTrigger //////////////////////");
+        }
     }
 
 

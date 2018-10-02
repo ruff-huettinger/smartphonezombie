@@ -10,6 +10,7 @@ public class SmombieGame : MonoBehaviour {
 
     private static SmombieGame instance;
 
+    [Header("quests")]
     public SmombieQuestManager questControl;
     public SmombieFinale finaleControl;
     
@@ -21,6 +22,7 @@ public class SmombieGame : MonoBehaviour {
     public delegate void boolDelegate(bool theBool);
     public boolDelegate onDebugChange;
 
+    [Header("path")]
     public recordAndPlayPath_Benja pathControl;
     public float speed;
     public float speedSmoothing = 0.5f;
@@ -28,8 +30,10 @@ public class SmombieGame : MonoBehaviour {
     public float setSpeedTarget;
     public float overrideSpeedTarget = 0;
 
+    [Header("audio")]
     public string audioFolder = "";
 
+    [Header("timings")]
     public float gametimeBeforeTimeout = 210.0f;          //maximale zeit des spiels
     public float gametimeBeforeFriends = 180.0f;          //time before friends gone
     public float gameTime = 0;                   //zeit des spiels (starts at zero)
@@ -91,8 +95,8 @@ public class SmombieGame : MonoBehaviour {
         if (debugInfo == null) debugInfo = FindObjectOfType<DebugInfo_benja>();
         if (finaleControl == null) finaleControl = FindObjectOfType<SmombieFinale>();
         if (questControl == null) questControl = FindObjectOfType<SmombieQuestManager>();
+        if (pathControl == null) pathControl = FindObjectOfType<recordAndPlayPath_Benja>();
 
- 
         questControl.setupAudio( Application.streamingAssetsPath + "/" + audioFolder );
         if (doggy == null) doggy = FindObjectOfType<SmombieDog>();
         doggy.Setup(audioFolder);
@@ -102,7 +106,6 @@ public class SmombieGame : MonoBehaviour {
         cityAppearance = FindObjectsOfType<randomAppearanceManager_benja>();
         instance.GAMEreset();
         instance.setDebugState(false);
-
 
     }
 
@@ -339,14 +342,16 @@ public class SmombieGame : MonoBehaviour {
         }
     }
 
-    
+
+
     // Update is called once per frame
     void Update () {
 
         cheatkeys();
-        debugInfo.log("game time", gameTime);
-        debugInfo.log("speed", speed);
-        debugInfo.log("position (" + pathControl.pathDistance+")",pathControl.playheadPositionInM );
+        debugInfo.log("game time", instance.gameTime);
+        debugInfo.log("speed", instance.speed);
+        //debugInfo.log("position (" + instance.pathControl.pathDistance + ")" , instance.pathControl.playheadPositionInM );
+        
         //pathProgress = pathControl.playheadPosition01();
         if (state == STATE.PLAYING)
         {
