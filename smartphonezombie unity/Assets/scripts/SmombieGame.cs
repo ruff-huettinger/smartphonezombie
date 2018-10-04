@@ -191,6 +191,24 @@ public class SmombieGame : MonoBehaviour {
         doggy.DOGstart();
     }
 
+    /// <summary>
+    /// called when foto motive appears
+    /// </summary>
+    public void GAMEfotoEnter()
+    {
+
+        Debug.LogError("handle foto quest enter here");
+    }
+
+    /// <summary>
+    /// called when foto motive disappears
+    /// </summary>
+    public void GAMEfotoExit()
+    {
+
+        Debug.LogError("handle foto quest exit here");
+    }
+
     void updateDog()
     {
         dogAnoying = !BenjasMath.countdownToZero(ref dogAnoyTime);

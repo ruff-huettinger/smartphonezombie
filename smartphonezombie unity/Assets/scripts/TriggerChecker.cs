@@ -14,7 +14,7 @@ public class TriggerChecker : MonoBehaviour {
         GetComponent<Collider>().isTrigger = true;
 	}
 
-    public void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         changeOnTrigger = !changeOnTrigger;
         if (onTrigger != null)

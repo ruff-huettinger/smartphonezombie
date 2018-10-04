@@ -10,12 +10,14 @@ public class SmombieQuestManager : MonoBehaviour
 
     public SmombieQuest[] quests;
     public SmombieSpawnPoint[] spawns;
+    public List<TriggerChecker> corners;
     public int fotoQuestsMax = 1;
     public int streetQuestsMax = 99;
     public int crossingQuestsMax = 99;
     public int carrierQuestsMax = 1;
     public int houseQuestsMax = 99;
     public int spawnsSold = 0;
+    public bool inFotoQuest = false;
 
     [SerializeField]
     class questList
@@ -60,8 +62,25 @@ public class SmombieQuestManager : MonoBehaviour
 
         spawns = GetComponentsInChildren<SmombieSpawnPoint>();
 
-       // Reset();
-    }
+        corners = GetComponentsInChildren<TriggerChecker>().ToList<TriggerChecker>();
+        for (int i = 0; i < corners.Count; i++)
+            if (corners[i].gameObject.name != "cornerTrigger")
+            {
+                Debug.Log("removing" + corners[i].gameObject.name);
+                corners.Remove(corners[i]);
+                i--;
+            }
+            else
+            {
+                corners[i].onTrigger = onReachCorner;
+            }
+
+            inFotoQuest = false;
+    // Reset();
+}
+
+
+
 
     public void setupAudio(string path)
     {
@@ -79,6 +98,16 @@ public class SmombieQuestManager : MonoBehaviour
             quest.onPass = onQuestPass;
             quest.onEnter = onQuestEnter;
         }
+    }
+
+    public void onReachCorner()
+    {
+        if (inFotoQuest)
+        {
+            inFotoQuest = false;
+            SmombieGame.GetInstance().GAMEfotoExit();
+        }
+  
     }
 
     /// <summary>
@@ -126,11 +155,12 @@ public class SmombieQuestManager : MonoBehaviour
         Debug.Log("enter detected by quest " + quest.name);
         if (quest.questtype == SmombieQuest.QUESTTYPE.FOTO)
         {
-            Debug.LogError("handle foto quest here");
+            inFotoQuest = true;
+            SmombieGame.GetInstance().GAMEfotoEnter();
         }
         SmombieGame.GetInstance().sendCodeForFinalTextCollection(quest.codeForFinaleText);
     }
-
+    
     /// <summary>
     /// called on quest pass, call finale texts here too
     /// </summary>
