@@ -23,9 +23,9 @@ public class Configuration
 
         try
         {
-            //var culture = new CultureInfo("en-US");
-            //CultureInfo.DefaultThreadCurrentCulture = culture;
-            //CultureInfo.DefaultThreadCurrentUICulture = culture;
+            var culture = new CultureInfo("en-US");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
 
             XmlDocument xmldoc = new XmlDocument();
 
@@ -135,7 +135,7 @@ public class Configuration
         string s = GetInnerTextByTagName(tagname, defaultDouble.ToString(), count);
         if (s != "")
         {
-            return (Convert.ToDouble(s));
+            //return (Convert.ToDouble(s));
             
 			double localCultreResult;
 			double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out localCultreResult);
