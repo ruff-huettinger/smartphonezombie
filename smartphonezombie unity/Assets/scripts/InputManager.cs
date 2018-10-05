@@ -35,6 +35,13 @@ public class InputManager : MonoBehaviour {
         instance = this;
     }
 
+    private void Start()
+    {
+        MeterPerScrollClick             = (float)Configuration.GetInnerTextByTagName("MeterPerScrollClick", MeterPerScrollClick);
+        MeterPerSecondPerScrollClick    = (float)Configuration.GetInnerTextByTagName("MeterPerSecondPerScrollClick", MeterPerSecondPerScrollClick);
+
+    }
+
     public void Reset()
     {
         speedInMPS = 0;
