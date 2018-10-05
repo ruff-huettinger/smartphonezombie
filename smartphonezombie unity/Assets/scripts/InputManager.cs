@@ -51,22 +51,31 @@ public class InputManager : MonoBehaviour {
     {
         return speedInMPS;
     }
-
+    public float mouseWheel = 0;
     private void Update()
     {
         float oldSpeed = speedInMPS;
-        // calculate speed
-        if(scrollContinouslyMode)
+
+        if(Input.mouseScrollDelta.y != 0)
         {
-            speedInMPS = Input.mouseScrollDelta.y * MeterPerScrollClick / Time.deltaTime;
+            mouseWheel = Input.mouseScrollDelta.y;
+        }
+
+        // calculate speed
+        if (scrollContinouslyMode)
+        {
+            //Debug.Log("Input.mouseScrollDelta.y " + Input.mouseScrollDelta.y);
+            speedInMPS = mouseWheel * MeterPerScrollClick / Time.deltaTime;
             if (!invertDirection) speedInMPS *= -1;
         }
         else
         {
-            speedInMPS = (Input.mouseScrollDelta.y * MeterPerSecondPerScrollClick);
+            speedInMPS = (mouseWheel * MeterPerSecondPerScrollClick);
             if (invertDirection) speedInMPS *= -1;
             speedInMPS = oldSpeed - speedInMPS;
         }
+
+        mouseWheel = 0;
 
 
         // clamp speed changes

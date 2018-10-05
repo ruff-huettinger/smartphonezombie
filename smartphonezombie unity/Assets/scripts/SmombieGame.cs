@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.IO.Compression;
+using System;
 //using IGP;
 
 public class SmombieGame : MonoBehaviour {
@@ -46,6 +47,8 @@ public class SmombieGame : MonoBehaviour {
 
     public bool handleDelay = false;
     public float delayTimeOnCrash = 7f;
+    private int senderPort;
+    private int listenerPort;
     public float delayTime;
 
     public bool prepareCrashFade = false;
@@ -54,8 +57,8 @@ public class SmombieGame : MonoBehaviour {
 
     public float finishReachedAtMeter = 243;   //no changes to friends accepted after this, otherwise appear or disappear visible
 
-
-
+    UDPListener udpListener;
+    UDPSender udpSender;
 
     public STATE state;
 
@@ -82,8 +85,7 @@ public class SmombieGame : MonoBehaviour {
         state = newState;
         debugInfo.log("state", state.ToString());
     }
-
-    
+        
     public static SmombieGame GetInstance()
     {
         return instance;
@@ -92,6 +94,15 @@ public class SmombieGame : MonoBehaviour {
     void Start()
     {
         instance = this;
+
+        Application.runInBackground = true;
+
+        gametimeBeforeTimeout   = (float)Configuration.GetInnerTextByTagName("gametimeBeforeTimeout", gametimeBeforeTimeout);
+        gametimeBeforeFriends   = (float)Configuration.GetInnerTextByTagName("gametimeBeforeFriends", gametimeBeforeFriends);
+        delayTimeOnCrash        = (float)Configuration.GetInnerTextByTagName("delayTimeOnCrash", delayTimeOnCrash);
+        senderPort              = (int)Configuration.GetInnerTextByTagName("senderPort", 5555);
+        listenerPort            = (int)Configuration.GetInnerTextByTagName("listenerPort", 4444);
+
         if (debugInfo == null) debugInfo = FindObjectOfType<DebugInfo_benja>();
         if (finaleControl == null) finaleControl = FindObjectOfType<SmombieFinale>();
         if (questControl == null) questControl = FindObjectOfType<SmombieQuestManager>();
@@ -107,10 +118,45 @@ public class SmombieGame : MonoBehaviour {
         instance.GAMEreset();
         instance.setDebugState(false);
 
+        udpListener = new UDPListener();
+        udpListener.MessageReceived += OnMessage;
+
+        udpListener.Start(listenerPort);
     }
 
+    bool gotMessageToStartGame = false;
+    bool gotMessageToStartPlay = false;
+    bool gotMessageToReset = false;
+    public void OnMessage(object sender, string e)
+    {
+        if(e.IndexOf("mousewheel=") > - 1)
+        {
+            e = e.Replace("mousewheel=", "");
+            double delta = Convert.ToDouble(e);
+            InputManager.GetInstance().mouseWheel = (float)delta;
+        }
+        else
+        {
+            InputManager.GetInstance().mouseWheel = 0;
+        }
 
-
+        if (e == "screensaver" || e == "intro")
+        {
+            gotMessageToReset = true;
+        }
+        if (e == "startgame")
+        {
+            if (state != STATE.ATSTART)
+            {
+                gotMessageToStartGame = true;
+            }
+        } else if (e == "startplay") {
+            if (state != STATE.PLAYING)
+            {
+                gotMessageToStartPlay = true;
+            }
+        }
+    }
 
     public void setDebugState(bool debugState)
     {
@@ -228,6 +274,7 @@ public class SmombieGame : MonoBehaviour {
 
     public void sendCodeForFinalTextCollection(string code)
     {
+        Debug.Log("code " + code);
         if (code != "")
         {
             //Your Code Here
@@ -364,6 +411,23 @@ public class SmombieGame : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
+
+        //UDP
+        if (gotMessageToStartGame)
+        {
+            gotMessageToStartGame = false;
+            GAMEstart();
+        }
+        if (gotMessageToStartPlay)
+        {
+            gotMessageToStartGame = false;
+            GAMEstartPlaying();
+        }
+        if (gotMessageToReset)
+        {
+            gotMessageToReset = false;
+            GAMEreset();
+        }
 
         cheatkeys();
         debugInfo.log("game time", instance.gameTime);
