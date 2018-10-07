@@ -7,17 +7,25 @@ using System.Linq;
 
 public class SmombieQuestManager : MonoBehaviour
 {
-
+    private bool neverUsed;
+    [Header("test quests at certain spawn points")]
+    public bool testspawnNow = false;
+    public int testspawnQuestIndex = -1;
+    public int atSpawnPointIndex = -1;
+    [Header("lists dont touch this")]
     public SmombieQuest[] quests;
     public SmombieSpawnPoint[] spawns;
     public List<TriggerChecker> corners;
+    [Header("adjustable preferences for quest distribution")]
     public int fotoQuestsMax = 1;
     public int streetQuestsMax = 99;
     public int crossingQuestsMax = 99;
     public int carrierQuestsMax = 1;
     public int houseQuestsMax = 99;
+    [Header("info dont touch this")]
     public int spawnsSold = 0;
     public bool inFotoQuest = false;
+
 
     [SerializeField]
     class questList
@@ -110,6 +118,14 @@ public class SmombieQuestManager : MonoBehaviour
   
     }
 
+
+
+    void testspawn()
+    {
+        testspawnNow = false;
+        foreach (SmombieQuest quest in quests) quest.gameObject.SetActive(false);
+        quests[testspawnQuestIndex].spawnAt(spawns[atSpawnPointIndex]);
+    }
     /// <summary>
     /// this will be called on a quest fail and manage the reaction
     /// grab the finale texts here too
@@ -175,10 +191,10 @@ public class SmombieQuestManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (testspawnNow) testspawn();
     }
 
-    public void distributeQuests()
+    public void distributeQuests(bool useTestspawn = false)
     {
         List<SmombieSpawnPoint> spawnsAvailable;
         questList fotoQuests = new questList(fotoQuestsMax);

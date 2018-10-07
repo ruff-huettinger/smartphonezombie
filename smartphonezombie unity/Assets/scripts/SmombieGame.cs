@@ -76,6 +76,8 @@ public class SmombieGame : MonoBehaviour {
         FINISH_TIMEOUT      //2330
     }
 
+   
+
     /// <summary>
     /// will change the current state to the given
     /// </summary>
@@ -119,9 +121,11 @@ public class SmombieGame : MonoBehaviour {
         instance.setDebugState(false);
 
         udpListener = new UDPListener();
-        udpListener.MessageReceived += OnMessage;
+        //removeMe    udpListener.MessageReceived += OnMessage;
 
         udpListener.Start(listenerPort);
+        
+       
     }
 
     bool gotMessageToStartGame = false;

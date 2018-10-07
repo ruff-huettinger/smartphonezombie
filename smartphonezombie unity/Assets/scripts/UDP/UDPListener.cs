@@ -12,7 +12,7 @@ public class UDPListener
     private IPEndPoint groupEP;
     public string encoding = "ascii";
 
-    public event EventHandler<string> MessageReceived;
+    //removeMe   public event EventHandler<string> MessageReceived;
 
 
     public bool Start(int port)
@@ -50,11 +50,11 @@ public class UDPListener
 
     protected virtual void OnMessageReceived(string txt)
     {
-        EventHandler<string> handler = MessageReceived;
-        if (handler != null)
-        {
-            handler(this, txt);
-        }
+        //removeMe    EventHandler<string> handler = MessageReceived;
+        //removeMe   if (handler != null)
+        //removeMe   {
+        //removeMe    handler(this, txt);
+        //removeMe   }
     }
 
     public void SetEncoding(string code)
