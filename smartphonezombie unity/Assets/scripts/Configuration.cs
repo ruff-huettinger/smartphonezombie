@@ -24,8 +24,8 @@ public class Configuration
         try
         {
             var culture = new CultureInfo("en-US");
-            //removeMe   CultureInfo.DefaultThreadCurrentCulture = culture;
-            //removeMe   CultureInfo.DefaultThreadCurrentUICulture = culture;
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
 
             XmlDocument xmldoc = new XmlDocument();
 
