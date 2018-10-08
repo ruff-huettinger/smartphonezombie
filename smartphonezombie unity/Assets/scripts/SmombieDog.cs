@@ -18,6 +18,7 @@ public class SmombieDog : MonoBehaviour {
     Vector3 scale;
     AudioLoader_benja loader;
     AudioSource barker;
+    public Canvas canvas;
     
 
     // Use this for initialization
@@ -27,6 +28,7 @@ public class SmombieDog : MonoBehaviour {
          loader = gameObject.AddComponent<AudioLoader_benja>();
         loader.loadAudioClip(Application.streamingAssetsPath +"/"+ audioPath, audioFilename);
         barker = gameObject.AddComponent<AudioSource>();
+        canvas = gameObject.GetComponentInParent<Canvas>();
 	}
 
     bool mirrored = false;
