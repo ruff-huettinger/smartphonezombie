@@ -133,7 +133,7 @@ public class SmombieQuestManager : MonoBehaviour
     /// <param name="quest"></param>
     public void onQuestFail(SmombieQuest quest)
     {
-        Debug.Log("fail detected by quest " + quest.name);
+        Debug.Log("CRASH: " + quest.name);
         switch (quest.reactionOnFail)
         {
             case SmombieQuest.REACTION_FAIL.DELAY:
@@ -168,7 +168,7 @@ public class SmombieQuestManager : MonoBehaviour
     /// <param name="quest"></param>
     public void onQuestEnter(SmombieQuest quest)
     {
-        Debug.Log("enter detected by quest " + quest.name);
+        Debug.Log("ENTER: " + quest.name);
         if (quest.questtype == SmombieQuest.QUESTTYPE.FOTO)
         {
             inFotoQuest = true;
@@ -183,7 +183,7 @@ public class SmombieQuestManager : MonoBehaviour
     /// <param name="quest"></param>
     public void onQuestPass(SmombieQuest quest)
     {
-        Debug.Log("pass detected by quest " + quest.name);
+        Debug.Log("PASS: " + quest.name);
         SmombieGame.GetInstance().sendCodeForFinalTextCollection(quest.codeForFinaleText);
     }
 
@@ -234,13 +234,13 @@ public class SmombieQuestManager : MonoBehaviour
         spawnsSold = 0;
 
         // loop one time for each spawnpoint even if it is picked in random order
-        int loopcount = spawns.Length;
-        for (int j = 0; j < loopcount; j++)
+        
+        for (int j = 0; j < spawns.Length; j++)
         {
             //fetch a random spawn point:
             int s = Random.Range(0, spawnsAvailable.Count - 1);
             bool spawnSold = false;
-
+            spawnsAvailable[s].Reset();
             //try to sell it to random quests in order of importance of questtype
             if (!spawnSold && spawnsAvailable[s].acceptsCarrierQuest)
             {

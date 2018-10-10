@@ -221,7 +221,7 @@ public class SmombieQuest : MonoBehaviour {
         stopAudio();
         if (loaders != null)
         {
-            Debug.Log("//////starting audio");
+            //Debug.Log("//////starting audio");
             for (int i = 0; i < loaders.Length && i < Sounds.Length; i++)
             {
 
@@ -288,6 +288,7 @@ public class SmombieQuest : MonoBehaviour {
                 startAnimation();
             }
             // else stopAnimation();
+            spawnPoint.passTrigger.onTrigger = null;
             codeForFinaleText = codeForFinaleTextOnPass;
             onPass(this);
         }
@@ -304,6 +305,7 @@ public class SmombieQuest : MonoBehaviour {
                 startAnimation();
             }
             // else stopAnimation();
+            spawnPoint.passTrigger.onTrigger = null;
             codeForFinaleText = codeForFinaleTextOnRun;
             onPass(this);
         }
@@ -315,9 +317,13 @@ public class SmombieQuest : MonoBehaviour {
         if (state == STATE.STANDBY)
         {
             setState(STATE.ACTIVATION);
+            codeForFinaleText = "";
+            spawnPoint.activationTrigger.onTrigger = null;
             onEnter(this);
-        }
 
+        }
+        
+        
     }
 
     public void handleIntro()

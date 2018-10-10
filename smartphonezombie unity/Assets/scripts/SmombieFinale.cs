@@ -8,8 +8,13 @@ public class SmombieFinale : MonoBehaviour {
     public GameObject dog;
     public GameObject friends;
     public GameObject nofriends;
+    public TriggerChecker poinOfNoReturn;
+    public TriggerChecker reachFinale;
     public bool dogIsFriend = false;
     public bool friendsPresent = true;
+    public delegate void voidDelegate();
+    public voidDelegate onReachedPointOfNoReturn;
+    public voidDelegate onReachedFinale;
 	// Use this for initialization
 	void Start () {
         Reset();
@@ -22,7 +27,19 @@ public class SmombieFinale : MonoBehaviour {
     {
         dogIsFriend = false;
         friendsPresent = true;
+        poinOfNoReturn.onTrigger = reachedPointOfNoReturn;
+        reachFinale.onTrigger = reachedFinale;
         update();
+    }
+
+    void reachedFinale()
+    {
+        onReachedFinale();
+    }
+
+    void reachedPointOfNoReturn()
+    {
+        onReachedPointOfNoReturn();
     }
 
     /// <summary>

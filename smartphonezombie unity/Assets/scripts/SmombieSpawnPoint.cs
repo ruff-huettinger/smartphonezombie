@@ -25,5 +25,12 @@ public class SmombieSpawnPoint : MonoBehaviour {
             Debug.LogError("something could not be found in this SmombieSpawnPoint: please apply SpawnPoints and Triggers per Inspector");
         }
 	}
-	
+
+    public void Reset()
+    {
+        passTrigger.onTrigger = null;
+        activationTrigger.onTrigger = null;
+        soldToo = null;
+    }
+
 }

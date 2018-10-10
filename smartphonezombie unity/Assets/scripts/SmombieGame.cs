@@ -101,6 +101,8 @@ public class SmombieGame : MonoBehaviour {
 
         if (debugInfo == null) debugInfo = FindObjectOfType<DebugInfo_benja>();
         if (finaleControl == null) finaleControl = FindObjectOfType<SmombieFinale>();
+        finaleControl.onReachedPointOfNoReturn = GAMEprepareFinale;
+        finaleControl.onReachedFinale = GAMEfinaleReached;
         if (questControl == null) questControl = FindObjectOfType<SmombieQuestManager>();
         if (pathControl == null) pathControl = FindObjectOfType<recordAndPlayPath_Benja>();
 
@@ -241,9 +243,9 @@ public class SmombieGame : MonoBehaviour {
 
     public void sendCodeForFinalTextCollection(string code)
     {
-        Debug.Log("code " + code);
         if (code != "")
         {
+            Debug.Log("code " + code);
             if (callback != null)
             {
                 callback(this, code);
@@ -297,6 +299,7 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void GAMEfinaleFriends()
     {
+        Debug.Log("FINALE: friends waiting");
         setState(STATE.FINISH_FRIENDS);
         if(callback != null)
         {
@@ -310,6 +313,7 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void GAMEfinaleNoFriends()
     {
+        Debug.Log("FINALE: friends gone");
         setState(STATE.FINISH_NO_FRIENDS);
         if (callback != null)
         {
@@ -318,14 +322,7 @@ public class SmombieGame : MonoBehaviour {
         }
     }
 
-    public void friendsLeave()
-    {
-        if(friendsWaiting)
-        {
-                finaleControl.friendsLeave();
-                friendsWaiting = false;
-        }
-    }
+ 
 
     /// <summary>
     /// uses this to set the speed in m/s
@@ -398,7 +395,21 @@ public class SmombieGame : MonoBehaviour {
         }
     }
 
+    public void GAMEprepareFinale()
+    {
+        if (gameTime > gametimeBeforeFriends)
+        {
+                finaleControl.friendsLeave();
+                friendsWaiting = false;
+        }
+        Debug.Log("PONR: friends " + (friendsWaiting ? "waiting":"gone"));
+    }
 
+    public void GAMEfinaleReached()
+    {
+      if (friendsWaiting) GAMEfinaleFriends();
+      else GAMEfinaleNoFriends();
+    }
 
     // Update is called once per frame
     void Update () {
@@ -413,19 +424,6 @@ public class SmombieGame : MonoBehaviour {
             if( BenjasMath.timer(ref gameTime, gametimeBeforeTimeout, pausing)>=1 )
             {
                 GAMEtimeout();
-            }
-
-            if (friendsWaiting
-                && gameTime > gametimeBeforeFriends
-                && pathProgress < finishReachedAtMeter)
-            {
-                friendsLeave();
-            }
-
-            if ( pathControl.playheadPosition01() >= 1)
-            {
-                if (friendsWaiting) GAMEfinaleFriends();
-                else GAMEfinaleNoFriends();
             }
 
             if (dogAnoying)
