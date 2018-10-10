@@ -57,6 +57,7 @@ public class SmombieGame : MonoBehaviour {
 
     public STATE state;
 
+    public event EventHandler<string> callback;
 
     public enum STATE
     {
@@ -199,8 +200,11 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void GAMEfotoEnter()
     {
-
-        Debug.LogError("handle foto quest enter here");
+        Debug.Log("handle foto quest enter here");
+        if (callback != null)
+        {
+            callback(this, "fotoenter");
+        }
     }
 
     /// <summary>
@@ -208,8 +212,11 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void GAMEfotoExit()
     {
-
-        Debug.LogError("handle foto quest exit here");
+        Debug.Log("handle foto quest exit here");
+        if (callback != null)
+        {
+            callback(this, "fotoexit");
+        }
     }
 
     void updateDog()
@@ -226,7 +233,10 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void GAMEwet()
     {
-        
+        if (callback != null)
+        {
+            callback(this, "13.20");
+        }
     }
 
     public void sendCodeForFinalTextCollection(string code)
@@ -234,7 +244,10 @@ public class SmombieGame : MonoBehaviour {
         Debug.Log("code " + code);
         if (code != "")
         {
-            //Your Code Here
+            if (callback != null)
+            {
+                callback(this, code);
+            }
         }
     }
 
@@ -247,6 +260,12 @@ public class SmombieGame : MonoBehaviour {
         {
             setState(STATE.FINISH_TIMEOUT);
             piano.PIANOstart();
+
+            if (callback != null)
+            {
+                string code = "23.30";
+                callback(this, code);
+            }
         }
 
     }
@@ -258,6 +277,11 @@ public class SmombieGame : MonoBehaviour {
     {
         instance.doggy.DOGstop();
         setState(STATE.FINISH_CRASH);
+        if (callback != null)
+        {
+            string code = "23.00";
+            callback(this, code);
+        }
     }
 
     /// <summary>
@@ -274,6 +298,11 @@ public class SmombieGame : MonoBehaviour {
     public void GAMEfinaleFriends()
     {
         setState(STATE.FINISH_FRIENDS);
+        if(callback != null)
+        {
+            string code = "23.10";
+            //callback(this, code);
+        }
     }
 
     /// <summary>
@@ -282,13 +311,18 @@ public class SmombieGame : MonoBehaviour {
     public void GAMEfinaleNoFriends()
     {
         setState(STATE.FINISH_NO_FRIENDS);
+        if (callback != null)
+        {
+            string code = "23.10";
+            callback(this, code);
+        }
     }
 
     public void friendsLeave()
     {
         if(friendsWaiting)
         {
-                            finaleControl.friendsLeave();
+                finaleControl.friendsLeave();
                 friendsWaiting = false;
         }
     }

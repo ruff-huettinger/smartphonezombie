@@ -15,13 +15,15 @@ public class GameManager : MonoBehaviour {
         senderPort = (int)Configuration.GetInnerTextByTagName("senderPort", 5555);
         listenerPort = (int)Configuration.GetInnerTextByTagName("listenerPort", 4444);
 
+        SmombieGame.GetInstance().callback += OnMessageFromSmombieGame;
+
         udpListener = new UDPListener();
-        udpListener.MessageReceived += OnMessage;
+        udpListener.MessageReceived += OnMessageFromUDP;
 
         udpListener.Start(listenerPort);
     }
 
-    public void OnMessage(object sender, string e)
+    public void OnMessageFromUDP(object sender, string e)
     {
         if (e.IndexOf("mousewheel=") > -1)
         {
@@ -52,5 +54,27 @@ public class GameManager : MonoBehaviour {
                 UnityMainThreadDispatcher.Instance().Enqueue(() => SmombieGame.GetInstance().GAMEstartPlaying());
             }
         }
+    }
+
+    public void OnMessageFromSmombieGame(object sender, string e)
+    {
+        if(e == "fotoenter")
+        {
+            SendMessage("cameraapp=visible");
+        }
+        else if(e == "fotoexit")
+        {
+            SendMessage("cameraapp=hidden");
+        }
+        else
+        {
+            SendMessage("event=" + e);
+        }
+    }
+
+    void SendMessage(string txt)
+    {
+        UDPSender.SendUDPStringASCII("127.0.0.1", senderPort, txt);
+
     }
 }
