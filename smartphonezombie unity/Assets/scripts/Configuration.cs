@@ -6,8 +6,6 @@ using System.Globalization;
 public class Configuration
 {
     //private enum TimeUnit { min, sec, ms };
-    static public float SCREENWIDTH             = 1920;
-    static public float SCREENHEIGHT            = 1080;
     static public string head_tag               = "config";
     static public string timeout_tag            = "timeout";
     static public string timeunit_attribute     = "timeunit";

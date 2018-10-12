@@ -1,0 +1,1 @@
+start /d Build build\Smartphone-Zombie.exe -popupwindow -screen-width 1080 -screen-height 1920

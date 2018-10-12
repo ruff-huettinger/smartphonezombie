@@ -303,8 +303,7 @@ public class SmombieGame : MonoBehaviour {
         setState(STATE.FINISH_FRIENDS);
         if(callback != null)
         {
-            string code = "23.10";
-            //callback(this, code);
+            callback(this, "23.10");
         }
     }
 
@@ -317,8 +316,7 @@ public class SmombieGame : MonoBehaviour {
         setState(STATE.FINISH_NO_FRIENDS);
         if (callback != null)
         {
-            string code = "23.10";
-            callback(this, code);
+            callback(this, "23.20");
         }
     }
 

@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour {
             InputManager.GetInstance().mouseWheel = 0;
         }
 
-        if (e == "screensaver" || e == "intro")
+        if (e == "reset" || e == "screensaver" || e == "intro")
         {
             UnityMainThreadDispatcher.Instance().Enqueue(() => SmombieGame.GetInstance().GAMEreset() );
         }
@@ -71,7 +71,6 @@ public class GameManager : MonoBehaviour {
             SendMessage("event=" + e);
         }
     }
-
     void SendMessage(string txt)
     {
         UDPSender.SendUDPStringASCII("127.0.0.1", senderPort, txt);
