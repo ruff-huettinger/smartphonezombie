@@ -272,7 +272,7 @@ public class SmombieQuest : MonoBehaviour {
                 startAnimation();
             }
             // else stopAnimation();
-            codeForFinaleText = codeForFinaleTextOnFail;
+            codeForFinaleText = codeForFinaleTextOnFail + storyboardSubId;
             onCrash(this);
         }
         
