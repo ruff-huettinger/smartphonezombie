@@ -54,6 +54,11 @@ public class InputManager : MonoBehaviour {
     public float mouseWheel = 0;
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+
         float oldSpeed = speedInMPS;
 
         if(Input.mouseScrollDelta.y != 0)
