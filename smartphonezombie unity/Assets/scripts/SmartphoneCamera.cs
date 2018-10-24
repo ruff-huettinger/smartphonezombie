@@ -24,15 +24,12 @@ public class SmartphoneCamera : MonoBehaviour {
         float r = (float)Convert.ToDouble(Configuration.GetAttricuteByTagName("camera_rotation", "x"));
         transform.localPosition = new Vector3(x, y, z);
         transform.localEulerAngles = new Vector3(r, 0, 0);
-
-
+        
         float fieldOfView = (float)Convert.ToDouble(Configuration.GetInnerTextByTagName("camera_field_of_view", 60));
         cam.fieldOfView = fieldOfView;
-
-
-
+        
         float vX = (float)Convert.ToDouble(Configuration.GetAttricuteByTagName("camera_viewport", "w"));
-        float vY = (float)Convert.ToDouble(Configuration.GetAttricuteByTagName("camera_viewport", "h"));
+        float vY = (float)Convert.ToDouble(Configuration.GetAttricuteByTagName("camera_viewport", "y"));
         float vW = (float)Convert.ToDouble(Configuration.GetAttricuteByTagName("camera_viewport", "w"));
         float vH = (float)Convert.ToDouble(Configuration.GetAttricuteByTagName("camera_viewport", "h"));
 
