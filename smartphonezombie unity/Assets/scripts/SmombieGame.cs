@@ -182,6 +182,7 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void GAMEdelay()
     {
+        updateDog(false);
         delayTime = delayTimeOnCrash;
         handleDelay = true;
     }
@@ -221,9 +222,11 @@ public class SmombieGame : MonoBehaviour {
         }
     }
 
-    void updateDog()
+    void updateDog(bool keepDogAnnoying = true)
     {
-        dogAnoying = !BenjasMath.countdownToZero(ref dogAnoyTime);
+
+        dogAnoying = keepDogAnnoying ? !BenjasMath.countdownToZero(ref dogAnoyTime) : false;
+
         if (!dogAnoying)
         {
             doggy.DOGstop();
@@ -260,7 +263,9 @@ public class SmombieGame : MonoBehaviour {
     {
         if (state == STATE.PLAYING)
         {
+
             setState(STATE.FINISH_TIMEOUT);
+             updateDog(false);
             piano.PIANOstart();
 
             if (callback != null)
@@ -277,7 +282,7 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void GAMEfinaleCrash()
     {
-        instance.doggy.DOGstop();
+         updateDog(false);
         setState(STATE.FINISH_CRASH);
         if (callback != null)
         {
@@ -292,6 +297,7 @@ public class SmombieGame : MonoBehaviour {
     public void GAMEfinaleDrawing()
     {
         setState(STATE.FINISH_CRASH);
+         updateDog(false);
         if (callback != null)
         {
             string code = "23.00";

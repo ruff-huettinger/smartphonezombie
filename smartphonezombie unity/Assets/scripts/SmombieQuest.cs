@@ -99,17 +99,6 @@ public class SmombieQuest : MonoBehaviour {
         PASS
     }
 
-    public void Start()
-    {
-        if (questtype != QUESTTYPE.FOTO)
-        {
-            TriggerChecker CrashTrigger = GetComponentInChildren<TriggerChecker>();
-            if (CrashTrigger != null && CrashTrigger.gameObject.name == "crashTrigger")
-                CrashTrigger.onTrigger = handleCrash;
-            else
-                Debug.Log("//////////////// Warning, quest lacks crashTrigger //////////////////////");
-        }
-    }
 
 
     public void spawnAt(SmombieSpawnPoint spawn)
@@ -133,7 +122,14 @@ public class SmombieQuest : MonoBehaviour {
             isMirrored = spawnPoint.isRightHandSide;
         }
 
-
+        if (questtype != QUESTTYPE.FOTO)
+        {
+            TriggerChecker CrashTrigger = GetComponentInChildren<TriggerChecker>();
+            if (CrashTrigger != null && CrashTrigger.gameObject.name == "crashTrigger")
+                CrashTrigger.onTrigger = handleCrash;
+            else
+                Debug.Log("//////////////// Warning, quest lacks crashTrigger //////////////////////");
+        }
 
         reset();
         gameObject.SetActive(true);
