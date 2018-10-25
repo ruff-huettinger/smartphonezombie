@@ -15,6 +15,11 @@ public class GameManager : MonoBehaviour {
         senderPort = (int)Configuration.GetInnerTextByTagName("senderPort", 5555);
         listenerPort = (int)Configuration.GetInnerTextByTagName("listenerPort", 4444);
 
+        if (Display.displays.Length > 1)
+        {
+            Display.displays[1].Activate();
+        }
+
         SmombieGame.GetInstance().callback += OnMessageFromSmombieGame;
 
         udpListener = new UDPListener();
@@ -54,6 +59,15 @@ public class GameManager : MonoBehaviour {
                 UnityMainThreadDispatcher.Instance().Enqueue(() => SmombieGame.GetInstance().GAMEstartPlaying());
             }
         }
+        else if (e == "hidecamera")
+        {
+            UnityMainThreadDispatcher.Instance().Enqueue(() => SmartphoneCamera.GetInstance().showView(false) );
+
+        }
+        else if (e == "showcamera")
+        {
+            UnityMainThreadDispatcher.Instance().Enqueue(() => SmartphoneCamera.GetInstance().showView(true));
+        }
     }
 
     public void OnMessageFromSmombieGame(object sender, string e)
@@ -61,10 +75,12 @@ public class GameManager : MonoBehaviour {
         if(e == "fotoenter")
         {
             SendMessage("cameraapp=visible");
+            SmartphoneCamera.GetInstance().showView(true);
         }
         else if(e == "fotoexit")
         {
             SendMessage("cameraapp=hidden");
+            SmartphoneCamera.GetInstance().showView(false);
         }
         else
         {

@@ -54,6 +54,19 @@ public class InputManager : MonoBehaviour {
     public float mouseWheel = 0;
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            SmartphoneCamera.GetInstance().showView(false);
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            SmartphoneCamera.GetInstance().showView(true);
+        }
+
         float oldSpeed = speedInMPS;
 
         if(Input.mouseScrollDelta.y != 0)

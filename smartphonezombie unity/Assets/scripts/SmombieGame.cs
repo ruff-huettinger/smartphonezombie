@@ -292,6 +292,11 @@ public class SmombieGame : MonoBehaviour {
     public void GAMEfinaleDrawing()
     {
         setState(STATE.FINISH_CRASH);
+        if (callback != null)
+        {
+            string code = "23.00";
+            callback(this, code);
+        }
     }
 
     /// <summary>

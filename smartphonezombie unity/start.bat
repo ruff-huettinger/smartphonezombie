@@ -1,1 +1,5 @@
-start /d Build build\SmartphoneZombie.exe -popupwindow -screen-width 2160 -screen-height 1920
+start /d Build build\SmartphoneZombie.exe -fullscreen
+Timeout 5
+start /d IGM IGM\bin-release\IGP.exe
+Timeout 5
+start /d IGP IGP\bin-release\IGP.exe
