@@ -154,8 +154,6 @@ public class SmombieQuest : MonoBehaviour {
             stopAnimation(true);
         }
         stopAudio();
-
-
     }
 
 

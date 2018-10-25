@@ -51,7 +51,7 @@ public class Helpers_benja : MonoBehaviour {
         AudioLoader_benja[] clips = new AudioLoader_benja[fileInfo.Length];
         for (int i = 0; i < fileInfo.Length; i++)
         {
-            Debug.Log(i + " loading audio file" + fileInfo[i].Name);
+            Debug.Log("♬ " + i + " loading audio file" + path+"/"+ fileInfo[i].Name);
             clips[i] = ScriptContainer.AddComponent<AudioLoader_benja>();
             clips[i].loadAudioClip(path,fileInfo[i].Name);
             

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,10 +19,11 @@ public class AudioLoader_benja : MonoBehaviour
         if(loadAudio)
         {
             loadAudio = false;
-            filePath = "file://" + Application.streamingAssetsPath + "/" + filePath + "/";
+
+            loadAudioClip(Application.streamingAssetsPath + "/" + filePath, fileName);
             StartCoroutine(LoadAudio());
         }
-        if(testAudio)
+        if (testAudio)
         {
             testAudio = false;
             AudioSource source = GetComponent<AudioSource>();
@@ -33,9 +34,8 @@ public class AudioLoader_benja : MonoBehaviour
     public void loadAudioClip(string path,string audioFileName)
     {
         filePath = "file://" + path + "/";
-        Debug.Log("filePath " + filePath);
-        Debug.Log("path " + path);
         fileName = audioFileName;
+        Debug.Log("♬ " + "loading clip " + filePath + "  ::  "+fileName);
         StartCoroutine(LoadAudio());
     }
 

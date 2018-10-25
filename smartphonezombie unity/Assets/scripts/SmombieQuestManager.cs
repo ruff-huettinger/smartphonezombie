@@ -74,7 +74,6 @@ public class SmombieQuestManager : MonoBehaviour
         for (int i = 0; i < corners.Count; i++)
             if (corners[i].gameObject.name != "cornerTrigger")
             {
-                Debug.Log("removing" + corners[i].gameObject.name);
                 corners.Remove(corners[i]);
                 i--;
             }
