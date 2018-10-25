@@ -59,9 +59,14 @@ public class GameManager : MonoBehaviour {
                 UnityMainThreadDispatcher.Instance().Enqueue(() => SmombieGame.GetInstance().GAMEstartPlaying());
             }
         }
-        else if (e == "hiddencamera")
+        else if (e == "hidecamera")
         {
-            SmartphoneCamera.GetInstance().showView(false);
+            UnityMainThreadDispatcher.Instance().Enqueue(() => SmartphoneCamera.GetInstance().showView(false) );
+
+        }
+        else if (e == "showcamera")
+        {
+            UnityMainThreadDispatcher.Instance().Enqueue(() => SmartphoneCamera.GetInstance().showView(true));
         }
     }
 
