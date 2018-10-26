@@ -7,25 +7,29 @@ public class SmombiePiano : MonoBehaviour {
 
     public bool dropPiano = false;
     public bool test = false;
-    public string audioFilename;
+    //public string audioFilename;
+    public AudioClip audioClip;
     //public string audioPath;
     public float pianodropLength = 2;
     float timer = 0;
     public float heightAbove = 3;
     public float heightFloor = 0;
 
-    AudioLoader_benja loader;
+    //AudioLoader_benja loader;
     AudioSource audio;
 
 
     // Use this for initialization
-    public void Setup(string audioPath)
+    public void Start()
     {
-         loader = gameObject.AddComponent<AudioLoader_benja>();
-        loader.loadAudioClip(Application.streamingAssetsPath +"/"+ audioPath, audioFilename);
+   //      loader = gameObject.AddComponent<AudioLoader_benja>();
+     //   loader.loadAudioClip(Application.streamingAssetsPath +"/"+ audioPath, audioFilename);
         audio = gameObject.AddComponent<AudioSource>();
+        audio.playOnAwake = false;
+        audio.loop = false;
+        audio.clip = audioClip;
 
-	}
+    }
 
 
     public void PIANOstart()
@@ -39,7 +43,7 @@ public class SmombiePiano : MonoBehaviour {
     public void Reset()
     {
         audio.Stop();
-        audio.clip = loader.audioClip;
+        //audio.clip = loader.audioClip;
         setPos(heightAbove);
         dropPiano = false;
     }

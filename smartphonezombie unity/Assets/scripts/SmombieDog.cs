@@ -7,7 +7,8 @@ public class SmombieDog : MonoBehaviour {
 
     public bool showDog = false;
     public bool loopDog = false;
-    public string audioFilename;
+    //public string audioFilename;
+    public AudioClip barkingClip;
     //public string audioPath;
     public float dogLoopLength = 2;
     float timer = 0;
@@ -16,7 +17,7 @@ public class SmombieDog : MonoBehaviour {
     public Vector2 posDownR;
     RectTransform trafo;
     Vector3 scale;
-    AudioLoader_benja loader;
+    //AudioLoader_benja loader;
     AudioSource barker;
     public Canvas canvas;
     
@@ -25,8 +26,8 @@ public class SmombieDog : MonoBehaviour {
     public void Setup (string audioPath) {
        trafo = GetComponent<RectTransform>();
         scale = trafo.localScale;
-         loader = gameObject.AddComponent<AudioLoader_benja>();
-        loader.loadAudioClip(Application.streamingAssetsPath +"/"+ audioPath, audioFilename);
+         //loader = gameObject.AddComponent<AudioLoader_benja>();
+        //loader.loadAudioClip(Application.streamingAssetsPath +"/"+ audioPath, audioFilename);
         barker = gameObject.AddComponent<AudioSource>();
         canvas = gameObject.GetComponentInParent<Canvas>();
 	}
@@ -52,7 +53,8 @@ public class SmombieDog : MonoBehaviour {
     {
         barker.Stop();
         barker.loop = true;
-        barker.clip = loader.audioClip;
+        //barker.clip = loader.audioClip;
+        barker.clip = barkingClip;
         mirrored = false;
         up = true;
         setPos(posDownL);

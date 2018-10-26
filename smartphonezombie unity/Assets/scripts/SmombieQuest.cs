@@ -13,12 +13,17 @@ public class SmombieQuest : MonoBehaviour {
     public string stateIdRun;
     public string stateIdPass;
     public string stateIdFail;
+    public AudioClip soundIntro;
+    public bool loopIntro = false;
+    public AudioClip soundPass;
+    public AudioClip soundFail;
+    private AudioSource audioSource;
     AudioLoader_benja[] audioIntro;
     AudioLoader_benja[] audioPass;
     AudioLoader_benja[] audioFail;
-    public string codeForFinaleTextOnPass = "";
-    public string codeForFinaleTextOnFail = "";
-    public string codeForFinaleTextOnRun = "";
+    //public string codeForFinaleTextOnPass = "";
+    //public string codeForFinaleTextOnFail = "";
+    //public string codeForFinaleTextOnRun = "";
 
 
 
@@ -99,7 +104,10 @@ public class SmombieQuest : MonoBehaviour {
         PASS
     }
 
-
+    private void Start()
+    {
+        setupAudio();
+    }
 
     public void spawnAt(SmombieSpawnPoint spawn)
     {
@@ -172,21 +180,23 @@ public class SmombieQuest : MonoBehaviour {
         { 
             foreach (GameObject quad in introQuad) if (quad != null) quad.SetActive(true);
             stopAudio();
-            playaudio(audioIntro, true);
+            playaudio(soundIntro, loopIntro);
         }
         else if(state == STATE.FAIL)
         {
              foreach (GameObject quad in failQuad) if (quad != null) quad.SetActive(true);
             stopAudio();
-            playaudio(audioFail);
+            playaudio(soundFail);
         }
         else if(state == STATE.PASS)
         {
             foreach (GameObject quad in passQuad) if (quad != null) quad.SetActive(true);
             stopAudio();
-            playaudio(audioPass);
+            playaudio(soundPass);
         }
     }
+
+
 
     private string storryboardCodeFile(string stateID)
     {
@@ -197,6 +207,17 @@ public class SmombieQuest : MonoBehaviour {
             audiofile += storyboardSubId;
         }
         return audiofile;
+    }
+
+    private string getCodeForFinalText(string stateID)
+    {
+        // 0401.S.0530.A
+        string code = storyboardId +"."+ stateID;
+        if (storyboardSubId.Length > 0)
+        {
+            code += storyboardSubId;
+        }
+        return code;
     }
 
     private string storryboardCode(string stateID)
@@ -210,6 +231,7 @@ public class SmombieQuest : MonoBehaviour {
         return audiofile;
     }
 
+    /*
     public void playaudio(AudioLoader_benja[] loaders, bool loop = false)
     {
         stopAudio();
@@ -224,11 +246,30 @@ public class SmombieQuest : MonoBehaviour {
                 Sounds[i].Play();
             }
         }
+    }*/
+
+    public void playaudio(AudioClip clip, bool loop = false)
+    {
+        stopAudio();
+        if (clip != null)
+        {
+            //Debug.Log("//////starting audio");
+            audioSource.clip = clip;
+            audioSource.loop = loop;
+            audioSource.Play();
+        }
     }
 
     public void stopAudio()
     {
         if (Sounds != null) foreach (AudioSource sound in Sounds) sound.Stop();
+        if (audioSource != null) audioSource.Stop();
+    }
+
+    public void setupAudio()
+    {
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
     }
 
     public void setupAudio(string AudioFolder)
@@ -266,7 +307,8 @@ public class SmombieQuest : MonoBehaviour {
                 startAnimation();
             }
             // else stopAnimation();
-            codeForFinaleText = codeForFinaleTextOnFail + storyboardSubId;
+            //codeForFinaleText = codeForFinaleTextOnFail + storyboardSubId;
+            codeForFinaleText = getCodeForFinalText(stateIdFail);
             onCrash(this);
         }
         
@@ -283,7 +325,8 @@ public class SmombieQuest : MonoBehaviour {
             }
             // else stopAnimation();
             spawnPoint.passTrigger.onTrigger = null;
-            codeForFinaleText = codeForFinaleTextOnPass;
+            //codeForFinaleText = codeForFinaleTextOnPass;
+            codeForFinaleText = getCodeForFinalText(stateIdPass);
             onPass(this);
         }
 
@@ -300,7 +343,8 @@ public class SmombieQuest : MonoBehaviour {
             }
             // else stopAnimation();
             spawnPoint.passTrigger.onTrigger = null;
-            codeForFinaleText = codeForFinaleTextOnRun;
+            //codeForFinaleText = codeForFinaleTextOnRun;
+            codeForFinaleText = getCodeForFinalText(stateIdRun);
             onPass(this);
         }
     }
