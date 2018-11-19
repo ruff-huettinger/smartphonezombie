@@ -18,6 +18,7 @@ public class SmombieGame : MonoBehaviour {
     public randomAppearanceManager_benja[] cityAppearance;
     public SmombieDog doggy;
     public SmombiePiano piano;
+    public SmombieDrawing drawing;
     public DebugInfo_benja debugInfo;
     public bool debug = false;
     public delegate void boolDelegate(bool theBool);
@@ -110,6 +111,7 @@ public class SmombieGame : MonoBehaviour {
         if (doggy == null) doggy = FindObjectOfType<SmombieDog>();
         doggy.Setup(audioFolder);
         if (piano == null) piano = FindObjectOfType<SmombiePiano>();
+        if (drawing == null) drawing = FindObjectOfType<SmombieDrawing>();
         //piano.Setup(audioFolder);
         //audioFolder = Application.streamingAssetsPath + "/" + audioFolder ;
         cityAppearance = FindObjectsOfType<randomAppearanceManager_benja>();
@@ -155,6 +157,7 @@ public class SmombieGame : MonoBehaviour {
         instance.dogAnoyTime = 0;
         instance.doggy.DOGstop();
         instance.piano.Reset();
+        instance.drawing.Reset();
 
         instance.setState(STATE.READY);
     }
@@ -298,6 +301,7 @@ public class SmombieGame : MonoBehaviour {
     {
         setState(STATE.FINISH_CRASH);
          updateDog(false);
+        drawing.drown();
         if (callback != null)
         {
             string code = "23.00";

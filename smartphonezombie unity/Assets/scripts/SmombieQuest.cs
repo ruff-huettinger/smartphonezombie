@@ -27,11 +27,13 @@ public class SmombieQuest : MonoBehaviour {
 
 
 
-    [Header("quest details")]
+    [Header("quest definition")]
     public QUESTTYPE questtype;
     public REACTION_FAIL reactionOnFail = REACTION_FAIL.NONE;
 
-    [Header("timings")]
+
+    [Header("timings and details")]
+    public float crashMinimumWalkingSpeed = 0f;
     public float delayIntroAfterActivation = 1f;
     public float timeUntilIntro;
     public float maxTimeUntilPass = 3f;
@@ -271,7 +273,7 @@ public class SmombieQuest : MonoBehaviour {
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.playOnAwake = false;
     }
-
+    /*
     public void setupAudio(string AudioFolder)
     {
 
@@ -295,12 +297,22 @@ public class SmombieQuest : MonoBehaviour {
         }
         else Debug.Log(gameObject.name + " has no sounds");
     }
+    */
+
 
 
     public void handleCrash()
     {
         if (state == STATE.INTRO || state == STATE.ACTIVATION)
         {
+            if (SmombieGame.GetInstance().speed < crashMinimumWalkingSpeed)
+            {
+                //there are quests that can be done by walking slow
+                handlePass();
+                return;
+            }
+
+
             setState(STATE.FAIL);
             if (startsAnimation == ANI.ONFAIL)
             {
