@@ -52,6 +52,9 @@ public class SmombieQuest : MonoBehaviour {
     public handler onEnter;
     public handler onPass;
 
+    public delegate float floatDelegate();
+    public floatDelegate getCrashSpeed;
+
     [Header("objects to be seen")]
     public GameObject[] standbyQuad = new GameObject[1];
     /// <summary>
@@ -305,7 +308,7 @@ public class SmombieQuest : MonoBehaviour {
     {
         if (state == STATE.INTRO || state == STATE.ACTIVATION)
         {
-            if (SmombieGame.GetInstance().speed < crashMinimumWalkingSpeed)
+            if (getCrashSpeed()!= null && getCrashSpeed() < crashMinimumWalkingSpeed)
             {
                 //there are quests that can be done by walking slow
                 handlePass();

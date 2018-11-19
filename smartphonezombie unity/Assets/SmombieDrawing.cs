@@ -9,6 +9,9 @@ public class SmombieDrawing : MonoBehaviour {
     public float evadeDistance = 1;
     public float evadeLookAngle = -15;
     [Header("info only")]
+    public bool evading = true;
+    public bool drowning = false;
+
     Vector3 localpos;
     Vector3 localEul;
 	// Use this for initialization
@@ -24,15 +27,15 @@ public class SmombieDrawing : MonoBehaviour {
         playerCam.localPosition = localpos;
         playerCam.localEulerAngles = localEul;
         drowning = false;
+        //evading = ;
         time = 0;
     }
 
     public void evade()
     {
-
+        evading = true;
     }
-    public bool evading = false;
-    public bool drowning = false;
+
     public void drown()
     {
         drowning = true;

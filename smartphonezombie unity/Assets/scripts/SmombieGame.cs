@@ -225,6 +225,8 @@ public class SmombieGame : MonoBehaviour {
         }
     }
 
+
+
     void updateDog(bool keepDogAnnoying = true)
     {
 
@@ -346,6 +348,15 @@ public class SmombieGame : MonoBehaviour {
         setSpeedTarget = metersPerSecond;
     }
 
+    /// <summary>
+    /// get current speed in m/s
+    /// </summary>
+    /// <returns>speed in m/s</returns>
+    public float GAMEgetSpeed()
+    {
+        return speed;
+    }
+
     void updateSpeed()
     {
 
@@ -382,9 +393,9 @@ public class SmombieGame : MonoBehaviour {
         {
             GAMEsetSpeed(0);
         }
-        if (Input.GetKeyDown("up"))
+        if (Input.GetKey("up"))
         {
-            GAMEsetSpeed(setSpeedTarget + .5f);
+            GAMEsetSpeed(.99f);
         }
         if (Input.GetKeyDown("q"))
         {
@@ -406,6 +417,7 @@ public class SmombieGame : MonoBehaviour {
         {
             GAMEtimeout();
         }
+
     }
 
     public void GAMEprepareFinale()
