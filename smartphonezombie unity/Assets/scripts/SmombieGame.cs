@@ -21,6 +21,7 @@ public class SmombieGame : MonoBehaviour {
     public SmombieDrawing drawing;
     public DebugInfo_benja debugInfo;
     public bool debug = false;
+    public bool godModeNoCrashes = false;
     public delegate void boolDelegate(bool theBool);
     public boolDelegate onDebugChange;
 
@@ -378,6 +379,7 @@ public class SmombieGame : MonoBehaviour {
             hotkeysToDebug = false;
             debugInfo.log(": CHEATKEYS", "",true);
             debugInfo.log("[ D ]", "toggle Debug",true);
+            debugInfo.log("[ G ]", "toggle God Mode (no crashes)", true);
             debugInfo.log("[down] / [ up ]", "spped +/-",true);
             debugInfo.log("[ Q ]", "reset",true);
             debugInfo.log("[ W ]", "go to start",true);
@@ -395,6 +397,9 @@ public class SmombieGame : MonoBehaviour {
         }
         if (Input.GetKey("up"))
         {
+            if(Input.GetKey("left shift"))
+            GAMEsetSpeed(6.99f);
+            else
             GAMEsetSpeed(.99f);
         }
         if (Input.GetKeyDown("q"))
@@ -416,6 +421,11 @@ public class SmombieGame : MonoBehaviour {
         if (Input.GetKeyDown("t"))
         {
             GAMEtimeout();
+        }
+        if (Input.GetKeyDown("g"))
+        {
+            godModeNoCrashes = !godModeNoCrashes;
+            debugInfo.log("[ G ]", "toggle God Mode (no crashes) (state: "+ (godModeNoCrashes?"on":"off"), true);
         }
 
     }

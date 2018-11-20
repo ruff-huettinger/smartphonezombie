@@ -133,6 +133,7 @@ public class SmombieQuestManager : MonoBehaviour
     /// <param name="quest"></param>
     public void onQuestFail(SmombieQuest quest)
     {
+        if (SmombieGame.GetInstance().godModeNoCrashes) return;
         Debug.Log("CRASH: " + quest.name);
         switch (quest.reactionOnFail)
         {
