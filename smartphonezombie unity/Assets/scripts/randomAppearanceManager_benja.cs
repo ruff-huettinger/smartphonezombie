@@ -50,57 +50,61 @@ public class randomAppearanceManager_benja : MonoBehaviour {
         {
             int[] mat = new int[0];          
             if (changeMaterials)
-                mat = BenjasMath.repeatArray(BenjasMath.intArray(0, materials.Length), maxObjects);
+                mat = BenjasMath.repeatArray(BenjasMath.intArray(0, materials.Length, true), maxObjects);
 
             int[] mes = new int[0];
             if (changeMeshes)
-                mes = BenjasMath.repeatArray(BenjasMath.intArray(0, meshes.Length), maxObjects);
+                mes = BenjasMath.repeatArray(BenjasMath.intArray(0, meshes.Length, true), maxObjects);
 
             int[] pos = new int[0];
             if (changePositions)
-                pos = BenjasMath.repeatArray(BenjasMath.intArray(0, posOffsets.Length), maxObjects);
+                pos = BenjasMath.repeatArray(BenjasMath.intArray(0, posOffsets.Length, true), maxObjects);
 
             int[] rot = new int[0];
             if (changeRotations)
-                rot = BenjasMath.repeatArray(BenjasMath.intArray(0, rotOffsets.Length), maxObjects);
+                rot = BenjasMath.repeatArray(BenjasMath.intArray(0, rotOffsets.Length,true), maxObjects);
 
-            List<RandomAppearence_benja> allObj = all.ToList<RandomAppearence_benja>();
-            int count = allObj.Count;
-
-            for (int j = 0; j < count; j++)
+            //enable all
+            for (int j=0;j<all.Length; j++)
             {
-                if (j < maxObjects)
+                all[j].rendi.enabled = true;
+            }
+
+            //disable some randomly
+            int[] disable = BenjasMath.intArray(0, all.Length, true);
+
+            for (int j = 0; j < all.Length-maxObjects; j++)
+            {
+                all[disable[j]].rendi.enabled = false;
+            }
+
+            //distribute the rest
+
+
+            int i=0;
+
+            for(int j = 0; j < all.Length; j++)
+            {
+                if (all[j].rendi.enabled)
                 {
-                    int i = Random.Range(0, allObj.Count);
-                    
-                    if (changeMaterials )
+                    if (changeMaterials)
                     {
-                        
-                            allObj[i].rendi.material = materials[mat[j]];
-                        
-                        
+                        all[j].rendi.material = materials[mat[i]];
                     }
                     if (changeMeshes)
                     {
-                        allObj[i].meshi.mesh = meshes[mes[j]];
+                        all[j].meshi.mesh = meshes[mes[i]];
                     }
                     if (changePositions)
                     {
-                        allObj[i].transform.localPosition = allObj[i].posOriginal + posOffsets[pos[j]];
+                        all[j].transform.localPosition = all[j].posOriginal + posOffsets[pos[i]];
                     }
                     if (changeRotations)
                     {
-                        allObj[i].transform.localEulerAngles = allObj[i].rotOriginal + rotOffsets[rot[j]];
+                        all[j].transform.localEulerAngles = all[j].rotOriginal + rotOffsets[rot[i]];
                     }
-                    allObj.RemoveAt(i);
-
+                    i++;
                 }
-                else
-                {
-                    allObj[0].rendi.enabled = false;
-                    allObj.RemoveAt(0);
-                }
-                
             }
         }
 

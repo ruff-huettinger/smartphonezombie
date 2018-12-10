@@ -256,13 +256,15 @@ public class smoothVector3{
 
     }
 
-    public static int[] intArray(int min, int maxPlusOne)
+    public static int[] intArray(int min, int maxPlusOne,bool randomized=false)
     {
         int[] newArray = new int[maxPlusOne - min];
         for (int i = 0; i < newArray.Length; i++)
         {
             newArray[i] = i + min;
         }
+        if (randomized)
+        randomizeArray(newArray);
         return newArray;
     }
 
