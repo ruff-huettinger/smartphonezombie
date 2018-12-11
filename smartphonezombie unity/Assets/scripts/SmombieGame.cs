@@ -36,6 +36,7 @@ public class SmombieGame : MonoBehaviour {
 
     [Header("audio")]
     public string audioFolder = "";
+    public AudioSource cityAtmoSound;
 
     [Header("timings")]
     public float gametimeBeforeTimeout = 210.0f;          //maximale zeit des spiels
@@ -167,6 +168,7 @@ public class SmombieGame : MonoBehaviour {
         instance.drawing.Reset();
 
         instance.setState(STATE.READY);
+        cityAtmoSound.Stop();
     }
 
     /// <summary>
@@ -175,6 +177,7 @@ public class SmombieGame : MonoBehaviour {
     public void GAMEstart()
     {
         setState(STATE.ATSTART);
+        cityAtmoSound.Play();
     }
 
     /// <summary>
@@ -183,7 +186,7 @@ public class SmombieGame : MonoBehaviour {
     public void GAMEstartPlaying()
     {
         setState(STATE.PLAYING);
-
+        cityAtmoSound.Play();
         pathControl.play();
     }
 
