@@ -112,7 +112,7 @@ public class randomAppearanceManager_benja : MonoBehaviour {
 
 
 	// Use this for initialization
-	void Awake () {
+	void Start () {
         all = GetComponentsInChildren<RandomAppearence_benja>();
 
         if (getValuesFromFirstObject)
