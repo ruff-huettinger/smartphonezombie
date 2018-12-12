@@ -15,7 +15,8 @@ public class SmombieGame : MonoBehaviour {
     public SmombieQuestManager questControl;
     public SmombieFinale finaleControl;
     
-    public randomAppearanceManager_benja[] cityAppearance;
+    public randomAppearanceManager_benja[] cityStatic;
+    public SmombieBackgroundAnimation[] cityMoving;
     public SmombieDog doggy;
     public SmombiePiano piano;
     public SmombieDrawing drawing;
@@ -35,6 +36,7 @@ public class SmombieGame : MonoBehaviour {
 
     [Header("audio")]
     public string audioFolder = "";
+    public AudioSource cityAtmoSound;
 
     [Header("timings")]
     public float gametimeBeforeTimeout = 210.0f;          //maximale zeit des spiels
@@ -115,7 +117,8 @@ public class SmombieGame : MonoBehaviour {
         if (drawing == null) drawing = FindObjectOfType<SmombieDrawing>();
         //piano.Setup(audioFolder);
         //audioFolder = Application.streamingAssetsPath + "/" + audioFolder ;
-        cityAppearance = FindObjectsOfType<randomAppearanceManager_benja>();
+        cityStatic = FindObjectsOfType<randomAppearanceManager_benja>();
+        cityMoving = FindObjectsOfType<SmombieBackgroundAnimation>();
         instance.GAMEreset();
         instance.setDebugState(false);
 
@@ -135,9 +138,13 @@ public class SmombieGame : MonoBehaviour {
     {
         instance.setState(STATE.RESETTING);
         
-        foreach (randomAppearanceManager_benja ram in instance.cityAppearance)
+        foreach (randomAppearanceManager_benja item in instance.cityStatic)
         {
-            ram.randomizeAppearance();
+            item.randomizeAppearance();
+        }
+        foreach (SmombieBackgroundAnimation item in instance.cityMoving)
+        {
+            item.reset();
         }
         instance.questControl.Reset();
         instance.finaleControl.Reset();
@@ -161,6 +168,7 @@ public class SmombieGame : MonoBehaviour {
         instance.drawing.Reset();
 
         instance.setState(STATE.READY);
+        cityAtmoSound.Stop();
     }
 
     /// <summary>
@@ -169,6 +177,7 @@ public class SmombieGame : MonoBehaviour {
     public void GAMEstart()
     {
         setState(STATE.ATSTART);
+        cityAtmoSound.Play();
     }
 
     /// <summary>
@@ -177,7 +186,7 @@ public class SmombieGame : MonoBehaviour {
     public void GAMEstartPlaying()
     {
         setState(STATE.PLAYING);
-
+        cityAtmoSound.Play();
         pathControl.play();
     }
 

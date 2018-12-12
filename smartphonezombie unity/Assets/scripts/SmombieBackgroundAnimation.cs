@@ -10,7 +10,7 @@ public class SmombieBackgroundAnimation : MonoBehaviour {
     //how far away should the object be before spawning next;
     public float minSpawnDistance = 7f; 
     public float maxSpawnDistance = 9f;
-    float spawnDistance = 0f;
+    public float spawnDistance = 0f;
     public List<RandomAppearence_benja> copies = new List<RandomAppearence_benja>();
     public List<float> animationTimes = new List<float>();
     public RandomAppearence_benja animatedObject;
@@ -38,6 +38,8 @@ public class SmombieBackgroundAnimation : MonoBehaviour {
         animationEnd.gameObject.SetActive(false);
         reset();
         animationTimePhase = Random.value * 2 * Mathf.PI;
+        maxSpawnDistance = Mathf.Min(maxSpawnDistance, Vector3.Distance(animationStart.position, animationEnd.position) * 0.999f);
+        minSpawnDistance = Mathf.Clamp(minSpawnDistance, 0.001f, maxSpawnDistance);
     }
 
     public void handleDeactivation()
@@ -48,11 +50,18 @@ public class SmombieBackgroundAnimation : MonoBehaviour {
     public void reset()
     {
         keepSpawning = true;
+        if (copies.Count < 1) spawnCopy();
     }
 
-
+    public bool blockSpawning = false;
     void spawnCopy()
     {
+        if (blockSpawning)
+        {
+            blockSpawning = false;
+            return;
+        }
+        blockSpawning = true;
         RandomAppearence_benja copy = Instantiate(animatedObject.gameObject.GetComponent<RandomAppearence_benja>());
         copy.gameObject.SetActive(true);
         copy.transform.parent = animatedObject.transform.parent;
@@ -62,7 +71,9 @@ public class SmombieBackgroundAnimation : MonoBehaviour {
         copy.randomizeAppearance();
         copies.Add(copy);
         animationTimes.Add(animationMaxTimeChanging);
-        spawnDistance = (Mathf.Lerp(minSpawnDistance, maxSpawnDistance, Random.value));
+        // make new spawn distance
+        spawnDistance = Mathf.Lerp(minSpawnDistance, maxSpawnDistance, Random.value);
+        spawnDistance = Mathf.Clamp(spawnDistance, 0.001f, Vector3.Distance(animationStart.position, animationEnd.position) * 0.999f);
     }
 
     void killCopy(int i)
@@ -100,10 +111,10 @@ public class SmombieBackgroundAnimation : MonoBehaviour {
                 }
             }
 
+
         if (keepSpawning && minDistToSpawnPoint >= spawnDistance)
         {
             spawnCopy();
         }
-
     }
 }
