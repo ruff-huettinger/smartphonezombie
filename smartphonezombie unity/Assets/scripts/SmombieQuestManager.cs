@@ -9,7 +9,6 @@ public class SmombieQuestManager : MonoBehaviour
 {
     private bool neverUsed;
     [Header("test quests at certain spawn points")]
-    public bool testspawnNow = false;
     public int testspawnQuestIndex = -1;
     public int atSpawnPointIndex = -1;
     [Header("lists dont touch this")]
@@ -66,6 +65,7 @@ public class SmombieQuestManager : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
+        testspawnQuestIndex = -1;
         quests = GetComponentsInChildren<SmombieQuest>();
 
         spawns = GetComponentsInChildren<SmombieSpawnPoint>();
@@ -118,13 +118,26 @@ public class SmombieQuestManager : MonoBehaviour
   
     }
 
+    int nextTestQuest = -1;
+
+    public void testQuest(bool nextQuest = true)
+    {
+        if (nextQuest) nextTestQuest++;
+        if (nextTestQuest < 0 || nextTestQuest >= quests.Length) nextTestQuest = 0;
+        testspawnQuestIndex = nextTestQuest;
+        testspawn();
+
+
+    }
 
 
     void testspawn()
     {
-        testspawnNow = false;
+        testspawnQuestIndex = Mathf.Clamp(testspawnQuestIndex,0, quests.Length - 1);
+        atSpawnPointIndex = Mathf.Clamp(atSpawnPointIndex, 0, spawns.Length - 1);
         foreach (SmombieQuest quest in quests) quest.gameObject.SetActive(false);
         quests[testspawnQuestIndex].spawnAt(spawns[atSpawnPointIndex]);
+        testspawnQuestIndex = -1;
     }
     /// <summary>
     /// this will be called on a quest fail and manage the reaction
@@ -139,6 +152,7 @@ public class SmombieQuestManager : MonoBehaviour
         {
             case SmombieQuest.REACTION_FAIL.DELAY:
                 SmombieGame.GetInstance().GAMEdelay();
+                delayedQuest = quest;
                 break;
 
             case SmombieQuest.REACTION_FAIL.DOG:
@@ -159,6 +173,17 @@ public class SmombieQuestManager : MonoBehaviour
 
         }
         SmombieGame.GetInstance().sendCodeForFinalTextCollection(quest.codeForFinaleText);
+    }
+
+    public SmombieQuest delayedQuest;
+
+    public void onContinueAfterDelay()
+    {
+        if(delayedQuest!= null)
+        {
+            delayedQuest.handleContinue();
+            delayedQuest = null;
+        }
     }
 
 
@@ -192,7 +217,7 @@ public class SmombieQuestManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (testspawnNow) testspawn();
+        if (testspawnQuestIndex>=0) testspawn();
     }
 
     public void distributeQuests(bool useTestspawn = false)

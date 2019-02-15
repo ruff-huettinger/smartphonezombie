@@ -395,6 +395,8 @@ public class SmombieGame : MonoBehaviour {
             debugInfo.log("[ E ]", "start playing",true);
             debugInfo.log("[ R ]", "the dog", true);
             debugInfo.log("[ T ]", "timeout", true);
+            debugInfo.log("[ S ]", "spawn a quest (cycling)", true);
+            debugInfo.log("[ D ]", "respawn same quest", true);
         }
         if (Input.GetKeyDown("d"))
         {
@@ -431,12 +433,17 @@ public class SmombieGame : MonoBehaviour {
         {
             GAMEtimeout();
         }
+        if (Input.GetKeyDown("s"))
+        {
+            GAMEreset();
+            questControl.testQuest( Input.GetKey("left shift"));
+            GAMEstartPlaying();
+        }
         if (Input.GetKeyDown("g"))
         {
             godModeNoCrashes = !godModeNoCrashes;
             debugInfo.log("[ G ]", "toggle God Mode (no crashes) (state: "+ (godModeNoCrashes?"on":"off"), true);
         }
-
     }
 
     public void GAMEprepareFinale()
@@ -477,16 +484,24 @@ public class SmombieGame : MonoBehaviour {
 
             if (handleDelay)
             {
-                handleDelay = !BenjasMath.countdownToZero(ref delayTime);
+                if(!BenjasMath.countdownToZero(ref delayTime))
+                {
+                    overrideSpeed = true;
+                }
+                else
+                {
+                    questControl.onContinueAfterDelay();
+                    handleDelay = false;
+                    overrideSpeed = false;
+                }
             }
-            overrideSpeed = handleDelay ;
             updateSpeed();
         }
         if (state == STATE.FINISH_CRASH || state == STATE.FINISH_TIMEOUT)
         {
             overrideSpeed = true;
             updateSpeed();
-         }
+        }
 
     }
 }
