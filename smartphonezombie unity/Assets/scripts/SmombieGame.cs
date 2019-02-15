@@ -121,7 +121,7 @@ public class SmombieGame : MonoBehaviour {
         cityMoving = FindObjectsOfType<SmombieBackgroundAnimation>();
         instance.GAMEreset();
         instance.setDebugState(false);
-
+        Debug.Log("game started");
     }
 
     public void setDebugState(bool debugState)
@@ -136,6 +136,7 @@ public class SmombieGame : MonoBehaviour {
     /// </summary>
     public void GAMEreset()
     {
+        Debug.Log("game resetting");
         instance.setState(STATE.RESETTING);
         
         foreach (randomAppearanceManager_benja item in instance.cityStatic)
@@ -169,6 +170,7 @@ public class SmombieGame : MonoBehaviour {
 
         instance.setState(STATE.READY);
         cityAtmoSound.Stop();
+        Debug.Log("game reseted");
     }
 
     /// <summary>
@@ -462,8 +464,12 @@ public class SmombieGame : MonoBehaviour {
       else GAMEfinaleNoFriends();
     }
 
+    bool resetAfterDelay = true;
+
     // Update is called once per frame
     void Update () {
+        if(resetAfterDelay && Time.realtimeSinceStartup>3)
+        { resetAfterDelay = false; GAMEreset(); }
         cheatkeys();
         debugInfo.log("game time", instance.gameTime);
         debugInfo.log("speed", instance.speed);

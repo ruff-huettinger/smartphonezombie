@@ -7,7 +7,7 @@ public class SmombieQuest : MonoBehaviour {
    
     private const string gameIdPrefix = "0401";
     [Header("storyboard codes")]
-    public string storyboardId = "00"; ///04..12
+    public string storyboardId = "00"; ///04.12
     public string storyboardSubId = ""; //A,B,C...
     public string stateIdIntro ;
     public string stateIdRun;
@@ -106,7 +106,11 @@ public class SmombieQuest : MonoBehaviour {
 
     private void Start()
     {
-        
+        foreach (GameObject obj in standbyObject) if (obj != null) obj.AddComponent<setActiveOnUpdate>();
+        foreach (GameObject obj in introObject) if (obj != null) obj.AddComponent<setActiveOnUpdate>();
+        foreach (GameObject obj in passObject) if (obj != null) obj.AddComponent<setActiveOnUpdate>();
+        foreach (GameObject obj in failObject) if (obj != null) obj.AddComponent<setActiveOnUpdate>();
+        foreach (GameObject obj in continueAfterFailObject) if (obj != null) obj.AddComponent<setActiveOnUpdate>();
     }
 
     public void spawnAt(SmombieSpawnPoint spawn)
@@ -159,39 +163,66 @@ public class SmombieQuest : MonoBehaviour {
         }
     }
 
+    void set(GameObject[]go, bool to)
+    {
+        foreach (GameObject obj in go)
+            if (obj != null)
+            {
+                setActiveOnUpdate setter = obj.GetComponent<setActiveOnUpdate>();
+                if (setter != null)
+                    setter.set(to);
+            }
+    }
 
+    void set(GameObject[] go)
+    {
+        foreach (GameObject obj in go)
+            if (obj != null)
+            {
+                setActiveOnUpdate setter = obj.GetComponent<setActiveOnUpdate>();
+                if (setter != null)
+                    setter.set();
+            }
+    }
 
     public void setState(STATE newState)
     {
         state = newState;
         //make all objects visible or invisible depending on their state
 
-        foreach (GameObject obj in standbyObject) if (obj != null) obj.SetActive(false);
-        foreach (GameObject obj in introObject) if (obj != null) obj.SetActive(false);
-        foreach (GameObject obj in passObject) if (obj != null) obj.SetActive(false);
-        foreach (GameObject obj in failObject) if (obj != null) obj.SetActive(false);
-        foreach (GameObject obj in continueAfterFailObject) if (obj != null) obj.SetActive(false);
+
+        set( standbyObject,false); 
+        set( introObject,false);
+        set( passObject,false);
+        set( failObject,false);
+        set( continueAfterFailObject,false);
 
         if (state == STATE.STANDBY)
         {
-            foreach (GameObject quad in standbyObject) if (quad != null) quad.SetActive(true);
+            set(standbyObject,true);
         }
         else if (state == STATE.INTRO || state == STATE.ACTIVATION)
         { 
-            foreach (GameObject quad in introObject) if (quad != null) quad.SetActive(true);
+            set(introObject,true);
         }
         else if (state == STATE.PASS)
         {
-            foreach (GameObject quad in passObject) if (quad != null) quad.SetActive(true);
+            set(passObject,true);
         }
         else if(state == STATE.FAIL)
         {
-             foreach (GameObject quad in failObject) if (quad != null) quad.SetActive(true);
+             set(failObject,true);
         }
         else if (state == STATE.CONTINUE)
         {
-            foreach (GameObject quad in continueAfterFailObject) if (quad != null) quad.SetActive(true);
+            set(continueAfterFailObject,true);
         }
+
+        set( standbyObject);
+        set( introObject);
+        set( passObject);
+        set( failObject);
+        set( continueAfterFailObject);
     }
 
 
