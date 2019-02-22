@@ -31,8 +31,8 @@ public class SmombieGame : MonoBehaviour {
     public float speed;
     public float speedSmoothing = 0.5f;
     public float pathProgress;
-    public float setSpeedTarget;
-    public float overrideSpeedTarget = 0;
+    public float speedTargetWalking;
+    public float speedTargetDelayed = 0;
 
     [Header("audio")]
     public string audioFolder = "";
@@ -119,7 +119,7 @@ public class SmombieGame : MonoBehaviour {
         //audioFolder = Application.streamingAssetsPath + "/" + audioFolder ;
         cityStatic = FindObjectsOfType<randomAppearanceManager_benja>();
         cityMoving = FindObjectsOfType<SmombieBackgroundAnimation>();
-        instance.GAMEreset();
+        //instance.GAMEreset();
         instance.setDebugState(false);
         Debug.Log("game started");
     }
@@ -153,8 +153,7 @@ public class SmombieGame : MonoBehaviour {
 
         instance.gameTime = 0;
         instance.speed = 0;
-        instance.setSpeedTarget = 0;
-        instance.overrideSpeed = false;
+        instance.speedTargetWalking = 0;
 
         instance.handleDelay = false;
         instance.delayTime = 0;
@@ -357,7 +356,7 @@ public class SmombieGame : MonoBehaviour {
     /// <param name="metersPerSecond"></param>
     public void GAMEsetSpeed(float metersPerSecond)
     {
-        setSpeedTarget = metersPerSecond;
+        speedTargetWalking = metersPerSecond;
     }
 
     /// <summary>
@@ -369,17 +368,19 @@ public class SmombieGame : MonoBehaviour {
         return speed;
     }
 
-    void updateSpeed()
+
+
+    void updateSpeed( float SpeedTarget)
     {
 
-        speed = Mathf.Lerp(   overrideSpeed ? overrideSpeedTarget : setSpeedTarget
+        speed = Mathf.Lerp(   SpeedTarget
                             , speed
                             , speedSmoothing
                           );
         pathControl.speedInMPerS = speed;
     }
 
-    public bool overrideSpeed = false;
+
 
     bool hotkeysToDebug = true;
 
@@ -468,7 +469,7 @@ public class SmombieGame : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        if(resetAfterDelay && Time.realtimeSinceStartup>3)
+        if(resetAfterDelay && Time.realtimeSinceStartup > 5)
         { resetAfterDelay = false; GAMEreset(); }
         cheatkeys();
         debugInfo.log("game time", instance.gameTime);
@@ -492,21 +493,23 @@ public class SmombieGame : MonoBehaviour {
             {
                 if(!BenjasMath.countdownToZero(ref delayTime))
                 {
-                    overrideSpeed = true;
+                    updateSpeed(speedTargetDelayed);
+                    return;
                 }
-                else
-                {
-                    questControl.onContinueAfterDelay();
-                    handleDelay = false;
-                    overrideSpeed = false;
-                }
+                questControl.onContinueAfterDelay();
+                handleDelay = false;
             }
-            updateSpeed();
+            updateSpeed(speedTargetWalking);
         }
-        if (state == STATE.FINISH_CRASH || state == STATE.FINISH_TIMEOUT)
+
+        if (state == STATE.FINISH_CRASH)
         {
-            overrideSpeed = true;
-            updateSpeed();
+            updateSpeed(speedTargetDelayed);
+        }
+
+        if (state == STATE.FINISH_TIMEOUT)
+        {
+            updateSpeed(0);
         }
 
     }

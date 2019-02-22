@@ -263,8 +263,7 @@ public class smoothVector3{
         {
             newArray[i] = i + min;
         }
-        if (randomized)
-        randomizeArray(newArray);
+        if (randomized) randomizeArray(newArray);
         return newArray;
     }
 
@@ -299,6 +298,18 @@ public class smoothVector3{
 	    }
 		
 	}
+
+    public static int cycle(int value, int max, int min = 0)
+    {
+        if(value==max) return min;
+        return value++;
+    }
+
+    public static int cycle(ref int value, int max, int min = 0)
+    {
+        if (value >= max) return min;
+        return value++;
+    }
 
     public static void randomizeArray(ArrayList Array)
     {

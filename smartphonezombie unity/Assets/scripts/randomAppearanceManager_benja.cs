@@ -12,6 +12,7 @@ public class randomAppearanceManager_benja : MonoBehaviour {
 
     public bool getValuesFromFirstObject = false;
 
+    public bool randomizeOrder = true;
     public Material[] materials;
     public bool changeMaterials = false;
 
@@ -24,11 +25,14 @@ public class randomAppearanceManager_benja : MonoBehaviour {
     public Vector3[] rotOffsets;
     public bool changeRotations = false;
 
+    public bool test = false;
+
     public void randomizeAppearance()
     {
         changeNow = false;
         if (!(reduceDoublets || maxObjects > 0))
         {
+            test = true;
             foreach (RandomAppearence_benja obj in all)
             {
                 obj.randomizeAppearance();
@@ -48,26 +52,27 @@ public class randomAppearanceManager_benja : MonoBehaviour {
         reduceDoublets = true;
         if (reduceDoublets)
         {
+            int offset = (int) Random.Range(0, 10);
             int[] mat = new int[0];          
             if (changeMaterials)
-                mat = BenjasMath.repeatArray(BenjasMath.intArray(0, materials.Length, true), maxObjects);
+                mat = BenjasMath.repeatArray(BenjasMath.intArray(0, materials.Length, randomizeOrder), maxObjects+ offset);
 
             int[] mes = new int[0];
             if (changeMeshes)
-                mes = BenjasMath.repeatArray(BenjasMath.intArray(0, meshes.Length, true), maxObjects);
+                mes = BenjasMath.repeatArray(BenjasMath.intArray(0, meshes.Length, randomizeOrder), maxObjects + offset);
 
             int[] pos = new int[0];
             if (changePositions)
-                pos = BenjasMath.repeatArray(BenjasMath.intArray(0, posOffsets.Length, true), maxObjects);
+                pos = BenjasMath.repeatArray(BenjasMath.intArray(0, posOffsets.Length, randomizeOrder), maxObjects+ offset);
 
             int[] rot = new int[0];
             if (changeRotations)
-                rot = BenjasMath.repeatArray(BenjasMath.intArray(0, rotOffsets.Length,true), maxObjects);
+                rot = BenjasMath.repeatArray(BenjasMath.intArray(0, rotOffsets.Length, randomizeOrder), maxObjects+ offset);
 
             //enable all
             for (int j=0;j<all.Length; j++)
             {
-                all[j].rendi.enabled = true;
+                all[j].visibalize();
             }
 
             //disable some randomly
@@ -75,40 +80,51 @@ public class randomAppearanceManager_benja : MonoBehaviour {
 
             for (int j = 0; j < all.Length-maxObjects; j++)
             {
-                all[disable[j]].rendi.enabled = false;
+                all[disable[j]].invisibalize();
             }
 
             //distribute the rest
 
 
-            int i=0;
+            int mati = offset;
+            int mesi = offset;
+            int posi = offset;
+            int roti = offset;
 
-            for(int j = 0; j < all.Length; j++)
+            for (int j = 0; j < all.Length; j++)
             {
+                Debug.Log(all[j].name + " " + all[j].rendi.enabled);
                 if (all[j].rendi.enabled)
                 {
-                    if (changeMaterials)
+
+                    if (changeMaterials && mat.Length>0)
                     {
-                        all[j].rendi.material = materials[mat[i]];
+                         BenjasMath.cycle(ref mati , mat.Length-1);
+                        Debug.Log(all[j].name +" "+mati);
+                        all[j].rendi.material = materials[mat[mati]];
                     }
-                    if (changeMeshes)
+                    if (changeMeshes && mes.Length > 0)
                     {
-                        all[j].meshi.mesh = meshes[mes[i]];
+                        BenjasMath.cycle(ref mesi, mes.Length-1);
+                        all[j].meshi.mesh = meshes[mes[mesi]];
                     }
-                    if (changePositions)
+                    if (changePositions && pos.Length > 0)
                     {
-                        all[j].transform.localPosition = all[j].posOriginal + posOffsets[pos[i]];
+                        BenjasMath.cycle(ref posi, pos.Length-1);
+                        all[j].transform.localPosition = all[j].posOriginal + posOffsets[pos[posi]];
                     }
-                    if (changeRotations)
+                    if (changeRotations && rot.Length > 0)
                     {
-                        all[j].transform.localEulerAngles = all[j].rotOriginal + rotOffsets[rot[i]];
+
+                        BenjasMath.cycle(ref roti, rot.Length-1);
+                        all[j].transform.localEulerAngles = all[j].rotOriginal + rotOffsets[rot[roti]];
                     }
-                    i++;
                 }
             }
         }
 
     }
+
 
 
 	// Use this for initialization

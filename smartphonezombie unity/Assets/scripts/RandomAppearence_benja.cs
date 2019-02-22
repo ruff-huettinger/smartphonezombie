@@ -24,6 +24,7 @@ public class RandomAppearence_benja : MonoBehaviour {
     private bool initiated = false;
 
     public float propabilityOfExistance = 1f;
+    string name = "";
 
     // Use this for initialization
     private void Awake () {
@@ -31,6 +32,7 @@ public class RandomAppearence_benja : MonoBehaviour {
 		meshi = this.gameObject.GetComponent<MeshFilter>();
         rotOriginal = transform.localEulerAngles;
         posOriginal = transform.localPosition;
+        name = gameObject.name;
         initiated = true;
 	}
 
@@ -44,39 +46,65 @@ public class RandomAppearence_benja : MonoBehaviour {
 		return (int) Mathf.Floor(Random.value*(float)(i+0.999999f));
 	}
 
+    public float probValue = 0;
+
     public void randomizeAppearance()
     {
         changeNow = false;
-        if (!initiated) Awake();
-        if (changeMeshes && meshes.Length > 1)
-        {
-            int i = randomInt(meshes.Length - 1);
-            if (meshes[i] != null)
-            {
-                meshi.mesh = meshes[i];
-            }
-        }
-        if (changeMaterials && materials.Length > 1)
-        {
-            int i = randomInt(materials.Length - 1);
-            if (materials[i] != null)
-            {
-                rendi.material = materials[i];
-            }
-        }
-        if (changePosition && posOffsets.Length > 1)
-        {
-                transform.localPosition = posOriginal + posOffsets[randomInt(posOffsets.Length - 1)];
-        }
-        if (changeRotations && rotOffsets.Length > 1)
-        {
-                transform.localEulerAngles = rotOriginal + rotOffsets[randomInt(rotOffsets.Length - 1)];
-        }
+
         Mathf.Clamp01(propabilityOfExistance);
-        if (propabilityOfExistance < 1)
+        probValue = Random.value;
+        if (probValue >= propabilityOfExistance)
+            invisibalize();
+        else
         {
-            rendi.enabled = Random.value < propabilityOfExistance;
+            visibalize();
+
+            if (changeMeshes && meshes.Length > 1)
+            {
+                int i = randomInt(meshes.Length - 1);
+                if (meshes[i] != null)
+                {
+                    meshi.mesh = meshes[i];
+                    gameObject.name += " mesh " + i.ToString();
+                }
+            }
+            if (changeMaterials && materials.Length > 1)
+            {
+                int i = randomInt(materials.Length - 1);
+                if (materials[i] != null)
+                {
+                    rendi.material = materials[i];
+                    gameObject.name += " material " + i.ToString();
+                }
+            }
+            if (changePosition && posOffsets.Length > 1)
+            {
+                int i = randomInt(posOffsets.Length - 1);
+                transform.localPosition = posOriginal + posOffsets[i];
+                gameObject.name += " pos " + i.ToString();
+            }
+            if (changeRotations && rotOffsets.Length > 1)
+            {
+                int i = randomInt(rotOffsets.Length - 1);
+                transform.localEulerAngles = rotOriginal + rotOffsets[i];
+                gameObject.name += " rot " + i.ToString();
+            }
         }
+
+
+    }
+
+    public void invisibalize()
+    {
+        rendi.enabled = false;
+        gameObject.name = name + "(invisible)";
+    }
+
+    public void visibalize()
+    {
+        rendi.enabled = true;
+        gameObject.name = name;
     }
 
     // Update is called once per frame
