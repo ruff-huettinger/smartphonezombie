@@ -307,8 +307,10 @@ public class smoothVector3{
 
     public static int cycle(ref int value, int max, int min = 0)
     {
-        if (value >= max) return min;
-        return value++;
+        value++;
+        if (value > max) value = min;
+        else if (value < min) value = min;
+        return value;
     }
 
     public static void randomizeArray(ArrayList Array)

@@ -52,20 +52,20 @@ public class randomAppearanceManager_benja : MonoBehaviour {
         reduceDoublets = true;
         if (reduceDoublets)
         {
-            int offset = (int) Random.Range(0, 10);
-            int[] mat = new int[0];          
+            offset = (int) Random.Range(0, 10);
+            mat = new int[0];          
             if (changeMaterials)
-                mat = BenjasMath.repeatArray(BenjasMath.intArray(0, materials.Length, randomizeOrder), maxObjects+ offset);
+                mat = BenjasMath.repeatArray(BenjasMath.intArray(0, materials.Length, randomizeOrder), maxObjects + offset);
 
-            int[] mes = new int[0];
+            mes = new int[0];
             if (changeMeshes)
                 mes = BenjasMath.repeatArray(BenjasMath.intArray(0, meshes.Length, randomizeOrder), maxObjects + offset);
 
-            int[] pos = new int[0];
+             pos = new int[0];
             if (changePositions)
                 pos = BenjasMath.repeatArray(BenjasMath.intArray(0, posOffsets.Length, randomizeOrder), maxObjects+ offset);
 
-            int[] rot = new int[0];
+             rot = new int[0];
             if (changeRotations)
                 rot = BenjasMath.repeatArray(BenjasMath.intArray(0, rotOffsets.Length, randomizeOrder), maxObjects+ offset);
 
@@ -85,11 +85,11 @@ public class randomAppearanceManager_benja : MonoBehaviour {
 
             //distribute the rest
 
-
-            int mati = offset;
-            int mesi = offset;
-            int posi = offset;
-            int roti = offset;
+            
+            mati = offset-1;
+            mesi = offset-1;
+            posi = offset-1;
+            roti = offset-1;
 
             for (int j = 0; j < all.Length; j++)
             {
@@ -125,10 +125,19 @@ public class randomAppearanceManager_benja : MonoBehaviour {
 
     }
 
+    public int[] mat;
+    public int[] mes;
+    public int[] pos;
+    public int[] rot;
+    public int offset;
+    public int mati ;
+    public int mesi ;
+    public int posi ;
+    public int roti ;
 
 
-	// Use this for initialization
-	void Awake () {
+    // Use this for initialization
+    void Awake () {
         all = GetComponentsInChildren<RandomAppearence_benja>();
 
         if (getValuesFromFirstObject)
