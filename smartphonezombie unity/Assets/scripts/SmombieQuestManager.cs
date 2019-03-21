@@ -139,6 +139,32 @@ public class SmombieQuestManager : MonoBehaviour
         quests[testspawnQuestIndex].spawnAt(spawns[atSpawnPointIndex]);
         testspawnQuestIndex = -1;
     }
+
+    /// <summary>
+    /// this will be called when a quest is getting activated, especially interesting for photo quests
+    /// </summary>
+    /// <param name="quest"></param>
+    public void onQuestEnter(SmombieQuest quest)
+    {
+        Debug.Log("ENTER: " + quest.name);
+        if (quest.questtype == SmombieQuest.QUESTTYPE.FOTO)
+        {
+            inFotoQuest = true;
+            SmombieGame.GetInstance().GAMEfotoEnter();
+        }
+        SmombieGame.GetInstance().sendInfoForFinalResultCollection(quest.codeForFinaleText);
+    }
+
+    /// <summary>
+    /// called on quest pass, call finale texts here too
+    /// </summary>
+    /// <param name="quest"></param>
+    public void onQuestPass(SmombieQuest quest)
+    {
+        Debug.Log("PASS: " + quest.name);
+        SmombieGame.GetInstance().sendInfoForFinalResultCollection(quest.codeForFinaleText, quest.finaleSnapshotFilePath);
+    }
+
     /// <summary>
     /// this will be called on a quest fail and manage the reaction
     /// grab the finale texts here too
@@ -172,7 +198,7 @@ public class SmombieQuestManager : MonoBehaviour
                 break;
 
         }
-        SmombieGame.GetInstance().sendCodeForFinalTextCollection(quest.codeForFinaleText);
+        SmombieGame.GetInstance().sendInfoForFinalResultCollection(quest.codeForFinaleText,quest.finaleSnapshotFilePath);
     }
 
     public SmombieQuest delayedQuest;
@@ -188,30 +214,7 @@ public class SmombieQuestManager : MonoBehaviour
 
 
 
-    /// <summary>
-    /// this will be called when a quest is getting activated, especially interesting for photo quests
-    /// </summary>
-    /// <param name="quest"></param>
-    public void onQuestEnter(SmombieQuest quest)
-    {
-        Debug.Log("ENTER: " + quest.name);
-        if (quest.questtype == SmombieQuest.QUESTTYPE.FOTO)
-        {
-            inFotoQuest = true;
-            SmombieGame.GetInstance().GAMEfotoEnter();
-        }
-        SmombieGame.GetInstance().sendCodeForFinalTextCollection(quest.codeForFinaleText);
-    }
-    
-    /// <summary>
-    /// called on quest pass, call finale texts here too
-    /// </summary>
-    /// <param name="quest"></param>
-    public void onQuestPass(SmombieQuest quest)
-    {
-        Debug.Log("PASS: " + quest.name);
-        SmombieGame.GetInstance().sendCodeForFinalTextCollection(quest.codeForFinaleText);
-    }
+
 
 
     // Update is called once per frame

@@ -37,6 +37,7 @@ public class SmombieGame : MonoBehaviour {
     [Header("audio")]
     public string audioFolder = "";
     public AudioSource cityAtmoSound;
+    public AudioSource easterEgg;
 
     [Header("timings")]
     public float gametimeBeforeTimeout = 210.0f;          //maximale zeit des spiels
@@ -110,13 +111,10 @@ public class SmombieGame : MonoBehaviour {
         if (questControl == null) questControl = FindObjectOfType<SmombieQuestManager>();
         if (pathControl == null) pathControl = FindObjectOfType<recordAndPlayPath_Benja>();
 
-        //questControl.setupAudio( Application.streamingAssetsPath + "/" + audioFolder );
         if (doggy == null) doggy = FindObjectOfType<SmombieDog>();
         doggy.Setup(audioFolder);
         if (piano == null) piano = FindObjectOfType<SmombiePiano>();
         if (drawing == null) drawing = FindObjectOfType<SmombieDrawing>();
-        //piano.Setup(audioFolder);
-        //audioFolder = Application.streamingAssetsPath + "/" + audioFolder ;
         cityStatic = FindObjectsOfType<randomAppearanceManager_benja>();
         cityMoving = FindObjectsOfType<SmombieBackgroundAnimation>();
         //instance.GAMEreset();
@@ -260,7 +258,27 @@ public class SmombieGame : MonoBehaviour {
         }
     }
 
-    public void sendCodeForFinalTextCollection(string code)
+    public void sendInfoForFinalResultCollection(string textCode, string snapshotPath = "")
+    {
+        if (textCode != "")
+        {
+            Debug.Log("code: " + textCode);
+            if (callback != null)
+            {
+                callback(this, textCode);
+            }
+        }
+        if (snapshotPath != "")
+        {
+            Debug.Log("snapshot: " + snapshotPath);
+            if (callback != null)
+            {
+                callback(this, snapshotPath);
+            }
+        }
+    }
+
+    public void sendCodeF(string code)
     {
         if (code != "")
         {
@@ -470,7 +488,11 @@ public class SmombieGame : MonoBehaviour {
     // Update is called once per frame
     void Update () {
         if(resetAfterDelay && Time.realtimeSinceStartup > 5)
-        { resetAfterDelay = false; GAMEreset(); }
+        {
+            resetAfterDelay = false;
+            GAMEreset();
+            easterEgg.gameObject.SetActive(true);
+        }
         cheatkeys();
         debugInfo.log("game time", instance.gameTime);
         debugInfo.log("speed", instance.speed);

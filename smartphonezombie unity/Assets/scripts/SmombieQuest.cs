@@ -23,6 +23,7 @@ public class SmombieQuest : MonoBehaviour {
     [Header("quest definition")]
     public QUESTTYPE questtype;
     public REACTION_FAIL reactionOnFail = REACTION_FAIL.NONE;
+    public renderTextureSnapshot questPhotoCam;
 
 
     [Header("timings and details")]
@@ -32,13 +33,6 @@ public class SmombieQuest : MonoBehaviour {
     public float maxTimeUntilPass = 3f;
     public float timeUntilPass = 0f;
     bool isMirrored = false;
-
-    public ANI startsAnimation = ANI.NEVER;
-    public float animationMaxTime;
-    public float animationTime;
-    public Transform animatedObject;
-    public Transform animationStart;
-    public Transform animationEnd;
 
     public delegate void handler(SmombieQuest quest);
     public handler onCrash;
@@ -64,6 +58,7 @@ public class SmombieQuest : MonoBehaviour {
     private AudioSource[] Sounds;
     public STATE state;
     public string codeForFinaleText = "";
+    public string finaleSnapshotFilePath = "";
 
     public enum REACTION_FAIL
     {
@@ -85,14 +80,6 @@ public class SmombieQuest : MonoBehaviour {
         FOTO
     }
 
-    public enum ANI
-    {
-        NEVER,
-        ONINTRO,
-        ONPASS,
-        ONFAIL
-    }
-
     public enum STATE
     {
         NONE,
@@ -111,6 +98,10 @@ public class SmombieQuest : MonoBehaviour {
         foreach (GameObject obj in passObject) if (obj != null) obj.AddComponent<setActiveOnUpdate>();
         foreach (GameObject obj in failObject) if (obj != null) obj.AddComponent<setActiveOnUpdate>();
         foreach (GameObject obj in continueAfterFailObject) if (obj != null) obj.AddComponent<setActiveOnUpdate>();
+        if (questPhotoCam == null) questPhotoCam = GetComponentInChildren <renderTextureSnapshot>();
+        questPhotoCam.fileName="finaleSnapshot_"+gameObject.name;
+        questPhotoCam.timestamp = false;
+        questPhotoCam.keepCamDisabled = true;
     }
 
     public void spawnAt(SmombieSpawnPoint spawn)
@@ -131,6 +122,7 @@ public class SmombieQuest : MonoBehaviour {
             Vector3 ls = gameObject.transform.localScale;
             ls.z *= -1;
             gameObject.transform.localScale = ls;
+            questPhotoCam.theCam.transform.Rotate(0, 180, 0);
             isMirrored = spawnPoint.isRightHandSide;
         }
 
@@ -155,12 +147,6 @@ public class SmombieQuest : MonoBehaviour {
         timeUntilIntro = delayIntroAfterActivation;
         
         if (storyboardId == "0000") Debug.LogError("set storyboard id in " + gameObject.name);
-        if (startsAnimation != ANI.NEVER)
-        {
-            animationEnd.gameObject.SetActive(false);
-            animationStart.gameObject.SetActive(false);
-            stopAnimation(true);
-        }
     }
 
     void set(GameObject[]go, bool to)
@@ -274,13 +260,9 @@ public class SmombieQuest : MonoBehaviour {
 
 
             setState(STATE.FAIL);
-            if (startsAnimation == ANI.ONFAIL)
-            {
-                startAnimation();
-            }
-            // else stopAnimation();
             //codeForFinaleText = codeForFinaleTextOnFail + storyboardSubId;
             codeForFinaleText = getCodeForFinalText(stateIdFail);
+            finaleSnapshotFilePath = questPhotoCam.takeSnapShot();
             onCrash(this);
         }
         
@@ -300,14 +282,10 @@ public class SmombieQuest : MonoBehaviour {
         if (state == STATE.INTRO || state == STATE.ACTIVATION)
         {
             setState(STATE.PASS);
-            if (startsAnimation == ANI.ONPASS)
-            {
-                startAnimation();
-            }
-            // else stopAnimation();
             spawnPoint.passTrigger.onTrigger = null;
             //codeForFinaleText = codeForFinaleTextOnPass;
             codeForFinaleText = getCodeForFinalText(stateIdPass);
+            finaleSnapshotFilePath = questPhotoCam.takeSnapShot();
             onPass(this);
         }
 
@@ -318,14 +296,10 @@ public class SmombieQuest : MonoBehaviour {
         if (state == STATE.INTRO || state == STATE.ACTIVATION)
         {
             setState(STATE.PASS);
-            if (startsAnimation == ANI.ONPASS)
-            {
-                startAnimation();
-            }
-            // else stopAnimation();
             spawnPoint.passTrigger.onTrigger = null;
             //codeForFinaleText = codeForFinaleTextOnRun;
             codeForFinaleText = getCodeForFinalText(stateIdRun);
+            finaleSnapshotFilePath = questPhotoCam.takeSnapShot();
             onPass(this);
         }
     }
@@ -336,7 +310,9 @@ public class SmombieQuest : MonoBehaviour {
         if (state == STATE.STANDBY)
         {
             setState(STATE.ACTIVATION);
+
             codeForFinaleText = "";
+            finaleSnapshotFilePath = "";
             spawnPoint.activationTrigger.onTrigger = null;
             onEnter(this);
 
@@ -346,43 +322,9 @@ public class SmombieQuest : MonoBehaviour {
     public void handleIntro()
     {
         setState(STATE.INTRO);
-        if (startsAnimation == ANI.ONINTRO)
-        {
-            startAnimation();
-        }
     }
 
-    private bool isAnimating = false;
-    void startAnimation()
-    {
-        isAnimating = true;
-        animationTime = 0;
-        setAnimationPosition(0);
-    }
 
-    void doAnimation()
-    {
-        if (setAnimationPosition(BenjasMath.timer(ref animationTime, animationMaxTime)))
-        {
-            stopAnimation();
-        }
-    }
-
-    public bool setAnimationPosition(float t)
-    {
-        if (animatedObject != null)
-        {
-            Mathf.Clamp01(t);
-            animatedObject.position = Vector3.Lerp( animationStart.position, animationEnd.position, t);
-        }
-        return t == 1; 
-    }
-
-    void stopAnimation(bool reset = false)
-    {
-        isAnimating = false;
-        if (reset) setAnimationPosition(0);
-    }
 
     void Update()
     {
@@ -405,9 +347,5 @@ public class SmombieQuest : MonoBehaviour {
             }
         }
 
-        if(isAnimating && (state == STATE.INTRO || state == STATE.PASS || state == STATE.FAIL))
-        {
-            doAnimation();
-        }
     }
 }
