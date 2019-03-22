@@ -7,6 +7,7 @@ public class renderTextureSnapshot : MonoBehaviour {
     public bool takeSnapshot;
     public bool timestamp;
     public string fileName = "";
+    private string subFolder = "snapshots";
     public string filePath;
     public Camera theCam;
 
@@ -18,6 +19,8 @@ public class renderTextureSnapshot : MonoBehaviour {
         }
         if (keepCamDisabled && theCam != null) theCam.enabled = false;
         if (fileName == "") fileName = this.name;
+        if (!System.IO.Directory.Exists(Application.dataPath + "/" + subFolder + "/"))
+            System.IO.Directory.CreateDirectory(Application.dataPath + "/" + subFolder + "/");
     }
     // Update is called once per frame
     void Update () {
@@ -67,7 +70,7 @@ public class renderTextureSnapshot : MonoBehaviour {
     {
         if (!lockFilePath)
         {
-            filePath = Application.dataPath + "/"+ fileName;
+            filePath = Application.dataPath + "/snapshots/"+ fileName;
             if (timestamp) filePath += "_" + Time.frameCount.ToString();
             filePath += ".png";
         }

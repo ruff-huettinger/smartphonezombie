@@ -64,7 +64,7 @@ public class SmombieDrawing : MonoBehaviour {
         {
             if (!evading)
             {
-                if (drawingQuest.state == SmombieQuest.STATE.ACTIVATION || drawingQuest.state == SmombieQuest.STATE.INTRO) evading = true;
+                if (drawingQuest.state == SmombieQuest.STATE.INTRO) evading = true;
             }
             else if (drawingQuest.state == SmombieQuest.STATE.FAIL || (drawingQuest.state == SmombieQuest.STATE.PASS && Vector3.Distance(playerCam.transform.position, evadePoint.transform.position) > detectionDistance))
             {

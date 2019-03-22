@@ -28,8 +28,6 @@ public class SmombieQuest : MonoBehaviour {
 
     [Header("timings and details")]
     public float crashMinimumWalkingSpeed = 0f;
-    public float delayIntroAfterActivation = 1f;
-    public float timeUntilIntro;
     public float maxTimeUntilPass = 3f;
     public float timeUntilPass = 0f;
     bool isMirrored = false;
@@ -84,7 +82,6 @@ public class SmombieQuest : MonoBehaviour {
     {
         NONE,
         STANDBY,
-        ACTIVATION,
         INTRO,
         PASS,
         FAIL,
@@ -112,7 +109,7 @@ public class SmombieQuest : MonoBehaviour {
         transform.position = spawnPoint.transform.position;
         transform.rotation = spawnPoint.transform.rotation;
 
-        spawnPoint.activationTrigger.onTrigger = handleActivation;
+        spawnPoint.activationTrigger.onTrigger = handleIntro;
         spawnPoint.passTrigger.onTrigger = handleRun;
 
 
@@ -144,8 +141,6 @@ public class SmombieQuest : MonoBehaviour {
     {
         gameObject.SetActive(false);
         timeUntilPass = maxTimeUntilPass;
-        timeUntilIntro = delayIntroAfterActivation;
-        
         if (storyboardId == "0000") Debug.LogError("set storyboard id in " + gameObject.name);
     }
 
@@ -187,7 +182,7 @@ public class SmombieQuest : MonoBehaviour {
         {
             set(standbyObject,true);
         }
-        else if (state == STATE.INTRO || state == STATE.ACTIVATION)
+        else if (state == STATE.INTRO)
         { 
             set(introObject,true);
         }
@@ -249,7 +244,7 @@ public class SmombieQuest : MonoBehaviour {
 
     public void handleCrash()
     {
-        if (state == STATE.INTRO || state == STATE.ACTIVATION)
+        if (state == STATE.INTRO )
         {
             if (getCrashSpeed()!= null && getCrashSpeed() < crashMinimumWalkingSpeed)
             {
@@ -279,7 +274,7 @@ public class SmombieQuest : MonoBehaviour {
 
     public void handlePass()
     {
-        if (state == STATE.INTRO || state == STATE.ACTIVATION)
+        if (state == STATE.INTRO )
         {
             setState(STATE.PASS);
             spawnPoint.passTrigger.onTrigger = null;
@@ -293,7 +288,7 @@ public class SmombieQuest : MonoBehaviour {
 
     public void handleRun()
     {
-        if (state == STATE.INTRO || state == STATE.ACTIVATION)
+        if (state == STATE.INTRO )
         {
             setState(STATE.PASS);
             spawnPoint.passTrigger.onTrigger = null;
@@ -305,23 +300,15 @@ public class SmombieQuest : MonoBehaviour {
     }
 
 
-    public void handleActivation()
-    {
-        if (state == STATE.STANDBY)
-        {
-            setState(STATE.ACTIVATION);
 
-            codeForFinaleText = "";
-            finaleSnapshotFilePath = "";
-            spawnPoint.activationTrigger.onTrigger = null;
-            onEnter(this);
-
-        }       
-    }
 
     public void handleIntro()
     {
         setState(STATE.INTRO);
+        codeForFinaleText = "";
+        finaleSnapshotFilePath = "";
+        spawnPoint.activationTrigger.onTrigger = null;
+        onEnter(this);
     }
 
 
@@ -329,15 +316,6 @@ public class SmombieQuest : MonoBehaviour {
     void Update()
     {
         
-        if (state == STATE.ACTIVATION)
-        {
-            //wait for delayIntroAfterActivation before going on 
-            if (BenjasMath.countdownToZero(ref timeUntilIntro))
-            {
-                handleIntro();
-            }
-        }
-
         if (state == STATE.INTRO)
         {
             //wait for maxTimeUntilPass before going on 

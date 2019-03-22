@@ -8,6 +8,8 @@ using System.Linq;
 public class SmombieQuestManager : MonoBehaviour
 {
     private bool neverUsed;
+    public RenderTexture snapShotTexture;
+    public Vector2Int snapShotResolution;
     [Header("test quests at certain spawn points")]
     public int testspawnQuestIndex = -1;
     public int atSpawnPointIndex = -1;
@@ -83,18 +85,12 @@ public class SmombieQuestManager : MonoBehaviour
             }
 
             inFotoQuest = false;
-    // Reset();
-}
-
-
-
-    /*
-    public void setupAudio(string path)
-    {
-       
-        foreach (SmombieQuest quest in quests) quest.setupAudio(path);
+        if (snapShotTexture != null && snapShotResolution.x > 0 && snapShotResolution.y > 0)
+            snapShotTexture.width = snapShotResolution.x;
+            snapShotTexture.height = snapShotResolution.y;
+        // Reset();
     }
-    */
+
     public void Reset()
     {
         Debug.Log("resetting quests");
@@ -115,7 +111,6 @@ public class SmombieQuestManager : MonoBehaviour
             inFotoQuest = false;
             SmombieGame.GetInstance().GAMEfotoExit();
         }
-  
     }
 
     int nextTestQuest = -1;
