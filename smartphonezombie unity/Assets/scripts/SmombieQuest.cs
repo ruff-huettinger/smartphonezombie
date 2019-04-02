@@ -96,7 +96,7 @@ public class SmombieQuest : MonoBehaviour {
         foreach (GameObject obj in failObject) if (obj != null) obj.AddComponent<setActiveOnUpdate>();
         foreach (GameObject obj in continueAfterFailObject) if (obj != null) obj.AddComponent<setActiveOnUpdate>();
         if (questPhotoCam == null) questPhotoCam = GetComponentInChildren <renderTextureSnapshot>();
-        questPhotoCam.fileName="finaleSnapshot_"+gameObject.name;
+        //questPhotoCam.fileName="finaleSnapshot_"+gameObject.name;
         questPhotoCam.timestamp = false;
         questPhotoCam.keepCamDisabled = true;
     }

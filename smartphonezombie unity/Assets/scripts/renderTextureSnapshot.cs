@@ -7,7 +7,7 @@ public class renderTextureSnapshot : MonoBehaviour {
     public bool takeSnapshot;
     public bool timestamp;
     public string fileName = "";
-    private string subFolder = "snapshots";
+    private string subFolder = "../snapshots";
     public string filePath;
     public Camera theCam;
 
@@ -19,8 +19,8 @@ public class renderTextureSnapshot : MonoBehaviour {
         }
         if (keepCamDisabled && theCam != null) theCam.enabled = false;
         if (fileName == "") fileName = this.name;
-        if (!System.IO.Directory.Exists(Application.dataPath + "/" + subFolder + "/"))
-            System.IO.Directory.CreateDirectory(Application.dataPath + "/" + subFolder + "/");
+        if (!System.IO.Directory.Exists(subFolder + "/"))
+            System.IO.Directory.CreateDirectory(subFolder + "/");
     }
     // Update is called once per frame
     void Update () {
@@ -70,7 +70,7 @@ public class renderTextureSnapshot : MonoBehaviour {
     {
         if (!lockFilePath)
         {
-            filePath = Application.dataPath + "/snapshots/"+ fileName;
+            filePath = subFolder + "/" + fileName;
             if (timestamp) filePath += "_" + Time.frameCount.ToString();
             filePath += ".png";
         }
@@ -93,15 +93,14 @@ public class renderTextureSnapshot : MonoBehaviour {
         {
             theCam.enabled = true;
             RenderTexture.active = theCam.targetTexture;
-            Texture2D tex = new Texture2D(theCam.targetTexture.width, theCam.targetTexture.height);
-
+            Texture2D tex = new Texture2D(theCam.targetTexture.width, theCam.targetTexture.height, TextureFormat.RGB24, true);
+         
             tex.ReadPixels(new Rect(0, 0, theCam.targetTexture.width, theCam.targetTexture.height), 0, 0);
             tex.Apply();
 
-
             // Encode texture into PNG
             byte[] bytes = tex.EncodeToPNG();
-            Object.Destroy(tex);
+            Destroy(tex);
 
             System.IO.File.WriteAllBytes(generateFilePath(), bytes);
         }

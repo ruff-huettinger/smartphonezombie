@@ -36,10 +36,6 @@ public class GameManager : MonoBehaviour {
             double delta = Convert.ToDouble(e);
             InputManager.GetInstance().mouseWheel = (float)delta;
         }
-        else
-        {
-            InputManager.GetInstance().mouseWheel = 0;
-        }
 
         if (e == "reset" || e == "screensaver" || e == "intro")
         {
@@ -87,9 +83,9 @@ public class GameManager : MonoBehaviour {
             SendMessage("event=" + e);
         }
     }
+
     void SendMessage(string txt)
     {
         UDPSender.SendUDPStringASCII("127.0.0.1", senderPort, txt);
-
     }
 }
