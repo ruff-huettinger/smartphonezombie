@@ -149,6 +149,8 @@ public class SmombieGame : MonoBehaviour {
         instance.finaleControl.Reset();
         instance.pathControl.stopPlaying(true);
 
+        instance.friendsWaiting = true;
+
         instance.gameTime = 0;
         instance.speed = 0;
         instance.speedTargetWalking = 0;
