@@ -26,10 +26,19 @@ public class SmombieQuest : MonoBehaviour {
     public renderTextureSnapshot questPhotoCam;
 
 
-    [Header("timings and details")]
+    [Header("timings and details",order = 1)]
+
+
+
+
     public float crashMinimumWalkingSpeed = 0f;
+    [Header("when triggered 'delay after activation' counts down, ", order = 2)]
+    [Tooltip("adds onto max Time Until Pass")]
+    public float delayAfterActivation = 0f;
+    [Header("then the gameobject will be swapped - then 'max Time Until Pass' will count down", order = 3)]
     public float maxTimeUntilPass = 3f;
-    public float timeUntilPass = 0f;
+    [Header("then it's save to walk on", order = 5)]
+    public float countdown = 0f;
     bool isMirrored = false;
 
     public delegate void handler(SmombieQuest quest);
@@ -40,11 +49,9 @@ public class SmombieQuest : MonoBehaviour {
     public delegate float floatDelegate();
     public floatDelegate getCrashSpeed;
 
-    [Header("objects to be seen")]
+    [Header("visible game objetcs")]
     public GameObject[] standbyObject = new GameObject[1];
-    /// <summary>
-    /// test
-    /// </summary>
+    public GameObject[] activeObject = new GameObject[1];
     public GameObject[] introObject = new GameObject[1];
     public GameObject[] passObject = new GameObject[1];
     public GameObject[] failObject = new GameObject[1];
@@ -82,6 +89,7 @@ public class SmombieQuest : MonoBehaviour {
     {
         NONE,
         STANDBY,
+        ACTIVATION,
         INTRO,
         PASS,
         FAIL,
@@ -109,7 +117,7 @@ public class SmombieQuest : MonoBehaviour {
         transform.position = spawnPoint.transform.position;
         transform.rotation = spawnPoint.transform.rotation;
 
-        spawnPoint.activationTrigger.onTrigger = handleIntro;
+        spawnPoint.activationTrigger.onTrigger = handleActivation;
         spawnPoint.passTrigger.onTrigger = handleRun;
 
 
@@ -140,7 +148,7 @@ public class SmombieQuest : MonoBehaviour {
     public void reset()
     {
         gameObject.SetActive(false);
-        timeUntilPass = maxTimeUntilPass;
+
         if (storyboardId == "0000") Debug.LogError("set storyboard id in " + gameObject.name);
     }
 
@@ -169,11 +177,13 @@ public class SmombieQuest : MonoBehaviour {
     public void setState(STATE newState)
     {
         state = newState;
+        Debug.Log(this.name + " is going into " + newState.ToString() + " state");
         //make all objects visible or invisible depending on their state
 
 
         set( standbyObject,false); 
-        set( introObject,false);
+        set( activeObject,false);
+        set( introObject, false);
         set( passObject,false);
         set( failObject,false);
         set( continueAfterFailObject,false);
@@ -181,6 +191,10 @@ public class SmombieQuest : MonoBehaviour {
         if (state == STATE.STANDBY)
         {
             set(standbyObject,true);
+        }
+        else if (state == STATE.ACTIVATION)
+        {
+            set(activeObject, true);
         }
         else if (state == STATE.INTRO)
         { 
@@ -200,6 +214,7 @@ public class SmombieQuest : MonoBehaviour {
         }
 
         set( standbyObject);
+        set( activeObject);
         set( introObject);
         set( passObject);
         set( failObject);
@@ -302,28 +317,33 @@ public class SmombieQuest : MonoBehaviour {
 
 
 
-    public void handleIntro()
+    public void handleActivation()
     {
-        setState(STATE.INTRO);
+        setState(STATE.ACTIVATION);
         codeForFinaleText = "";
         finaleSnapshotFilePath = "";
+        countdown = delayAfterActivation;
         spawnPoint.activationTrigger.onTrigger = null;
         onEnter(this);
     }
 
+    public void handleIntro()
+    {
+        setState(STATE.INTRO);
+        countdown = maxTimeUntilPass;
+    }
 
 
     void Update()
     {
-        
-        if (state == STATE.INTRO)
+        if (state == STATE.ACTIVATION)
+        {
+            if (BenjasMath.countdownToZero(ref countdown)) handleIntro();
+        }
+        else if (state == STATE.INTRO)
         {
             //wait for maxTimeUntilPass before going on 
-            if (BenjasMath.countdownToZero(ref timeUntilPass))
-            {
-                handlePass();
-            }
+            if (BenjasMath.countdownToZero(ref countdown)) handlePass();
         }
-
     }
 }
