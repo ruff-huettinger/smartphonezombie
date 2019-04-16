@@ -1,7 +1,30 @@
 <config>
+	<isDev>true</isDev>
 	<camera_position x="0" y="0" z="0" />
 	<camera_rotation x="-10" />
 	<camera_field_of_view>60</camera_field_of_view>
 	<camera_viewport x="0" y="0" w="1" h="1" />
-
+	<MeterPerScrollClick>0.012</MeterPerScrollClick>
+	<!-- <delay_after_activation>1.5</delay_after_activation>-->
+	<!--  Verliebtes Paar -->
+	<delay_after_activation_06>1.9</delay_after_activation_06>
+	<!--  Alte Dame -->
+	<delay_after_activation_07>0.8</delay_after_activation_07>
+	<!-- Straßenkünstlerin -->
+	<delay_after_activation_08>1.7</delay_after_activation_08>
+	<!-- Hund -->
+	<delay_after_activation_10>1.9</delay_after_activation_10>
+	<!-- Autotür -->
+	<delay_after_activation_11>1.9</delay_after_activation_11>
+	<!-- Blumenwasser -->
+	<delay_after_activation_13>1.9</delay_after_activation_13>				
+<!-- -->
+	<!-- Ampel -->
+	<delay_after_activation_04>1.5</delay_after_activation_04>
+	<!-- Träger -->
+	<delay_after_activation_05>1.5</delay_after_activation_05>
+	<!-- Spielmannszug -->
+	<delay_after_activation_09>1.5</delay_after_activation_09>
+	<!-- Fotomotiv -->
+	<delay_after_activation_12>0</delay_after_activation_12>
 </config>

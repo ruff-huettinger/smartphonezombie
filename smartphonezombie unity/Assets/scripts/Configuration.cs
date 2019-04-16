@@ -153,6 +153,21 @@ public class Configuration
         return defaultvalue;
     }
 
+    static public bool HasTagName(string tagname, int count = 0)
+    {
+        try
+        {
+            if (configXML == null)
+                LoadConfig();
+
+            return configXML.GetElementsByTagName(tagname).Count > 0;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+
     static public string GetAttricuteByTagName(string tagname, string attribute, int count = 0)
     {
         if (configXML == null)

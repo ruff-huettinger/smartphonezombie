@@ -96,6 +96,17 @@ public class SmombieQuest : MonoBehaviour {
         CONTINUE
     }
 
+    private void Awake()
+    {
+        string endId = "";
+        if (Configuration.HasTagName("delay_after_activation_" + storyboardId))
+        {
+            endId = "_" + storyboardId;
+        }
+ 
+        delayAfterActivation = (float)Configuration.GetInnerTextByTagName("delay_after_activation" + endId, delayAfterActivation);
+    }
+
     private void Start()
     {
         foreach (GameObject obj in standbyObject) if (obj != null) obj.AddComponent<setActiveOnUpdate>();

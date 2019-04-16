@@ -24,6 +24,7 @@ public class InputManager : MonoBehaviour {
     public float smoothing0To1 = 0;
     public float speedInMPS = 0;
 
+    bool isDev = false;
 
     public static InputManager GetInstance()
     {
@@ -39,7 +40,7 @@ public class InputManager : MonoBehaviour {
     {
         MeterPerScrollClick             = (float)Configuration.GetInnerTextByTagName("MeterPerScrollClick", MeterPerScrollClick);
         MeterPerSecondPerScrollClick    = (float)Configuration.GetInnerTextByTagName("MeterPerSecondPerScrollClick", MeterPerSecondPerScrollClick);
-
+        isDev = Configuration.GetInnerTextByTagName("isDev", isDev);
     }
 
     public void Reset()
@@ -69,7 +70,7 @@ public class InputManager : MonoBehaviour {
 
         float oldSpeed = speedInMPS;
 
-        if(Input.mouseScrollDelta.y != 0)
+        if(Input.mouseScrollDelta.y != 0 && isDev)
         {
             mouseWheel = Input.mouseScrollDelta.y;
         }
