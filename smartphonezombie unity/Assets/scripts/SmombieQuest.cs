@@ -270,7 +270,7 @@ public class SmombieQuest : MonoBehaviour {
 
     public void handleCrash()
     {
-        if (state == STATE.INTRO )
+        if (state == STATE.INTRO || state == STATE.ACTIVATION)
         {
             if (getCrashSpeed()!= null && getCrashSpeed() < crashMinimumWalkingSpeed)
             {

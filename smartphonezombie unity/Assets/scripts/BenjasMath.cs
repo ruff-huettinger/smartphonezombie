@@ -420,14 +420,17 @@ public class smoothVector3{
     {
         if (currentTime == 0)
         {
+            //make it fast if it's done, no uneccessary calculations
             return true;
         }
         currentTime -= Time.deltaTime;
         if (currentTime <= 0)
         {
+            //clamp it to minimum of 0
             currentTime = 0;
             return true;
         }
+        // keep going
         return false;
     }
 
