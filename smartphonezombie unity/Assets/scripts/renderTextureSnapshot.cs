@@ -66,6 +66,7 @@ public class renderTextureSnapshot : MonoBehaviour {
         if(theCam!=null) theCam.enabled = false;
     }
 
+
     private string generateFilePath(bool unlockFilePath = false)
     {
         if (!lockFilePath)
@@ -77,6 +78,8 @@ public class renderTextureSnapshot : MonoBehaviour {
         lockFilePath = !unlockFilePath;
         return filePath;
     }
+
+    public bool clearTargetrTextureAfterSnapshot = false;
 
     // Take a shot immediately
     IEnumerator snapshot()
@@ -97,12 +100,26 @@ public class renderTextureSnapshot : MonoBehaviour {
          
             tex.ReadPixels(new Rect(0, 0, theCam.targetTexture.width, theCam.targetTexture.height), 0, 0);
             tex.Apply();
+            
 
             // Encode texture into PNG
             byte[] bytes = tex.EncodeToPNG();
+            // Resources.UnloadAsset(tex); //UnloadAsset can only be used on assets;
             Destroy(tex);
-
-            System.IO.File.WriteAllBytes(generateFilePath(), bytes);
+            if (clearTargetrTextureAfterSnapshot)
+            {
+                Resources.UnloadAsset(theCam.targetTexture);
+                // Destroy(theCam.targetTexture); //Destroying assets is not permitted to avoid data loss.
+            }
+            try
+            {
+                System.IO.File.WriteAllBytes(generateFilePath(), bytes);
+            }
+            catch
+            {
+                Debug.Log("ERROR writing the snapshot data to " + generateFilePath());
+            }
+            bytes = new byte[0];
         }
     }
 }
