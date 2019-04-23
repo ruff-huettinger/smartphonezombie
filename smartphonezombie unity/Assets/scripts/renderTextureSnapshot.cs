@@ -79,7 +79,7 @@ public class renderTextureSnapshot : MonoBehaviour {
         return filePath;
     }
 
-    public bool clearTargetrTextureAfterSnapshot = false;
+    public bool clearTargetTextureAfterSnapshot = false;
 
     // Take a shot immediately
     IEnumerator snapshot()
@@ -106,7 +106,7 @@ public class renderTextureSnapshot : MonoBehaviour {
             byte[] bytes = tex.EncodeToPNG();
             // Resources.UnloadAsset(tex); //UnloadAsset can only be used on assets;
             Destroy(tex);
-            if (clearTargetrTextureAfterSnapshot)
+            if (clearTargetTextureAfterSnapshot)
             {
                 Resources.UnloadAsset(theCam.targetTexture);
                 // Destroy(theCam.targetTexture); //Destroying assets is not permitted to avoid data loss.
@@ -120,6 +120,7 @@ public class renderTextureSnapshot : MonoBehaviour {
                 Debug.Log("ERROR writing the snapshot data to " + generateFilePath());
             }
             bytes = new byte[0];
+            theCam.enabled = false;
         }
     }
 }

@@ -487,8 +487,12 @@ public class SmombieGame : MonoBehaviour {
 
     bool resetAfterDelay = true;
 
+
+
     // Update is called once per frame
     void Update () {
+
+        
         if(resetAfterDelay && Time.realtimeSinceStartup > 5)
         {
             resetAfterDelay = false;
@@ -535,7 +539,7 @@ public class SmombieGame : MonoBehaviour {
         {
             updateSpeed(0);
         }
-
+        debugInfo.log("current main Camera", Camera.main.gameObject.name);
     }
 }
 

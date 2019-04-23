@@ -118,7 +118,7 @@ public class SmombieQuest : MonoBehaviour {
         //questPhotoCam.fileName="finaleSnapshot_"+gameObject.name;
         questPhotoCam.timestamp = false;
         questPhotoCam.keepCamDisabled = true;
-        questPhotoCam.clearTargetrTextureAfterSnapshot = true;
+        questPhotoCam.clearTargetTextureAfterSnapshot = false;
     }
 
     public void spawnAt(SmombieSpawnPoint spawn)
