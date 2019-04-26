@@ -1,4 +1,4 @@
-<config>
+﻿<config>
 	<isDev>true</isDev>
 	<camera_position x="0" y="0" z="0" />
 	<camera_rotation x="-10" />
@@ -22,7 +22,7 @@
 	<!-- Ampel -->
 	<delay_after_activation_04>1.5</delay_after_activation_04>
 	<!-- Träger -->
-	<delay_after_activation_05>1.5</delay_after_activation_05>
+	<delay_after_activation_05>0.5</delay_after_activation_05>
 	<!-- Spielmannszug -->
 	<delay_after_activation_09>1.5</delay_after_activation_09>
 	<!-- Fotomotiv -->

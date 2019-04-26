@@ -33,6 +33,8 @@ public class SmombieGame : MonoBehaviour {
     public float pathProgress;
     public float speedTargetWalking;
     public float speedTargetDelayed = 0;
+    public float testSpeedWalking = 1;
+    public float testSpeedRunning = 5;
 
     [Header("audio")]
     public string audioFolder = "";
@@ -432,9 +434,9 @@ public class SmombieGame : MonoBehaviour {
         if (Input.GetKey("up"))
         {
             if(Input.GetKey("left shift"))
-            GAMEsetSpeed(6.99f);
+            GAMEsetSpeed(testSpeedRunning);
             else
-            GAMEsetSpeed(.99f);
+            GAMEsetSpeed(testSpeedWalking);
         }
         if (Input.GetKeyDown("q"))
         {
